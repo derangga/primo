@@ -1,0 +1,14 @@
+{
+  "name": "@primo/contract",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "types": "tsc -p . && effect-language-service diagnostics --project tsconfig.json"
+  },
+  "dependencies": {
+    "effect": "4.0.2"
+  }
+}

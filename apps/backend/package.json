@@ -1,0 +1,16 @@
+{
+  "name": "@primo/backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "types": "tsc -p . && effect-language-service diagnostics --project tsconfig.json"
+  },
+  "dependencies": {
+    "@primo/contract": "workspace:*",
+    "alchemy": "2.0.0-beta.81",
+    "effect": "4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5"
+  }
+}

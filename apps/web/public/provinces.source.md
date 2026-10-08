@@ -1,0 +1,9 @@
+# provinces.json
+
+34 province outlines for the map, one GeoJSON feature per PIHPS province. Each feature's `id` and `properties.id` is the PIHPS province id (1 to 34).
+
+- **Source.** geoBoundaries gbOpen, Indonesia ADM1, boundary `IDN-ADM1-65028918`, release commit `9469f09`: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/ADM1/geoBoundaries-IDN-ADM1.geojson. Built from OpenStreetMap (Wambacher), representing 2017, so it already has the 34 pre-2022 provinces. Papua and Papua Barat cover the four newer Papua provinces and nothing was merged.
+- **Licence.** Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/). Data © OpenStreetMap contributors. This file is a derived database under the same licence. The site must show "© OpenStreetMap contributors" wherever the map appears.
+- **Ids.** Matched by ISO 3166-2 code, then each name checked against PIHPS `GetRefProvince`: AC 1, SU 2, SB 3, RI 4, KR 5, JA 6, BE 7, SS 8, BB 9, LA 10, BT 11, JB 12, JK 13, JT 14, YO 15, JI 16, BA 17, NB 18, NT 19, KB 20, KS 21, KT 22, KI 23, KU 24, GO 25, SN 26, SG 27, ST 28, SA 29, SR 30, MA 31, MU 32, PA 33, PB 34.
+- **Simplification.** mapshaper 0.7.80: `-filter-islands min-area=30km2 -simplify 3% weighted keep-shapes -clean -o format=geojson precision=0.001`. The source properties were then replaced with the id, and every ring was rewound so outer rings run clockwise and holes counter-clockwise, which is what d3-geo (and so TanStack Charts) expects. RFC 7946 winding draws each province as the whole globe minus the province.
+- **Checked.** Rendered through d3-geo's Mercator projection and looked at on 2026-10-08. Areas from d3-geo: DKI Jakarta 648 km², DI Yogyakarta 3,188 km², Bali 5,564 km², Papua 316,958 km², Papua Barat 95,788 km². The last two are the pre-2022 extents. 281,982 bytes.

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chart view</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./tokens.css">
+<link rel="stylesheet" href="./components.css">
+<script src="./provinces.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="fpm app" data-theme="{{theme}}">
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs>
+<symbol id="i-down" viewBox="0 0 14 14"><path d="M3 5.5l4 4 4-4"></path></symbol>
+<symbol id="i-alert" viewBox="0 0 14 14"><path d="M7 1.8l5.6 10H1.4z"></path><path d="M7 6v2.6M7 10.4v.1"></path></symbol>
+<symbol id="i-retry" viewBox="0 0 14 14"><path d="M11.5 7a4.5 4.5 0 1 1-1.4-3.3"></path><path d="M11.6 2v2.6H9"></path></symbol>
+<symbol id="i-sun" viewBox="0 0 14 14"><circle cx="7" cy="7" r="2.6"></circle><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"></path></symbol>
+<symbol id="i-moon" viewBox="0 0 14 14"><path d="M11.5 8.2A5 5 0 0 1 5.8 2.5a5 5 0 1 0 5.7 5.7z"></path></symbol>
+<symbol id="i-system" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="7.5" rx="1.2"></rect><path d="M5 12.5h4M7 10v2.5"></path></symbol>
+<symbol id="i-nav-map" viewBox="0 0 14 14"><path d="M1.5 3.5l3.5-1.5 4 1.5 3.5-1.5v8.5l-3.5 1.5-4-1.5-3.5 1.5zM5 2v9M9 3.5v9"></path></symbol>
+<symbol id="i-nav-chart" viewBox="0 0 14 14"><path d="M1.5 12.5h11M2 9.5l3-3 2.5 2 4-4.5"></path></symbol>
+<symbol id="i-nav-power" viewBox="0 0 14 14"><path d="M3 5h8l-.8 7.5H3.8zM5 5V4a2 2 0 0 1 4 0v1"></path></symbol>
+</defs></svg>
+
+<header class="hdr">
+<div class="hdr-title">Food Price Monitor</div>
+<nav class="tabs" aria-label="Views"><a class="tab" href="MapView.dc.html"><svg class="ic only-narrow"><use href="#i-nav-map"></use></svg>Map</a><a class="tab is-selected" href="ChartView.dc.html"><svg class="ic only-narrow"><use href="#i-nav-chart"></use></svg>Chart</a><a class="tab" href="PowerView.dc.html"><svg class="ic only-narrow"><use href="#i-nav-power"></use></svg>Purchasing Power</a></nav>
+<sc-if value="{{isFilled}}" hint-placeholder-val="{{true}}"><div class="badge hdr-end"><span class="dot"></span><span>Data <b>7 Oct 2026</b></span></div></sc-if>
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}"><div class="badge is-error hdr-end"><svg class="ic"><use href="#i-alert"></use></svg><span>Data unavailable</span></div></sc-if>
+<button type="button" class="iconbtn is-round" aria-label="Theme: {{themeName}}"><svg class="ic"><use href="{{themeIcon}}"></use></svg></button>
+</header>
+
+<main class="page">
+
+<div class="filters">
+<div class="field"><span class="overline">Commodity</span><button type="button" class="ctl" style="width: 280px"><span>Beras</span><svg class="ic"><use href="#i-down"></use></svg></button></div>
+<div class="field"><span class="overline">Area</span><button type="button" class="ctl" style="width: 240px"><span>National</span><svg class="ic"><use href="#i-down"></use></svg></button></div>
+<div class="field"><span class="overline">Range</span><div class="seg"><button type="button">7 days</button><button type="button" class="is-selected">1 month</button><button type="button">3 months</button></div></div>
+</div>
+
+<sc-if value="{{isFilled}}" hint-placeholder-val="{{true}}">
+<div class="tiles">
+<div class="card tile"><div class="overline">Current price</div><div class="num num-lg"><span class="rp">Rp</span> 16.400<span class="unit">/kg</span></div><div class="small muted">7 Oct 2026</div></div>
+<div class="card tile"><div class="overline">Change, 1 month</div><div class="num num-lg">+1,5%</div><div class="delta is-up"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 1l4 7H1z" fill="currentColor"></path></svg>+Rp 250</div></div>
+<div class="card tile"><div class="overline">Lowest</div><div class="num num-lg"><span class="rp">Rp</span> 16.100<span class="unit">/kg</span></div><div class="small muted">10 Sep 2026</div></div>
+<div class="card tile"><div class="overline">Highest</div><div class="num num-lg"><span class="rp">Rp</span> 16.450<span class="unit">/kg</span></div><div class="small muted">1 Oct 2026</div></div>
+</div>
+<section class="card" aria-label="Price over time">
+<div class="card-head"><span class="card-title">Price over time</span><span class="small muted">Beras · National · Rp/kg</span></div>
+<svg class="chart only-wide" viewBox="0 0 1280 284" role="img" aria-label="Area chart of the national Beras price from 8 Sep to 7 Oct 2026, with a two day gap">
+<path class="grid" d="M64 16H1264M64 96H1264M64 176H1264"></path>
+<path class="area" d="{{wide.area}}"></path>
+<path class="line" d="{{wide.line}}"></path>
+<path class="axis" d="M64 256H1264"></path>
+<circle class="dot" cx="{{wide.ex}}" cy="{{wide.ey}}" r="4.5"></circle>
+<text x="54" y="20" style="text-anchor: end">16.600</text>
+<text x="54" y="100" style="text-anchor: end">16.400</text>
+<text x="54" y="180" style="text-anchor: end">16.200</text>
+<text x="54" y="260" style="text-anchor: end">16.000</text>
+<text x="64" y="278">8 Sep</text>
+<text x="353.7" y="278" style="text-anchor: middle">15 Sep</text>
+<text x="643.3" y="278" style="text-anchor: middle">22 Sep</text>
+<text x="933" y="278" style="text-anchor: middle">29 Sep</text>
+<text x="1264" y="278" style="text-anchor: end">7 Oct</text>
+</svg>
+<svg class="chart only-narrow" viewBox="0 0 326 214" role="img" aria-label="Area chart of the national Beras price from 8 Sep to 7 Oct 2026, with a two day gap">
+<path class="grid" d="M48 10H320M48 68.7H320M48 127.3H320"></path>
+<path class="area" d="{{narrow.area}}"></path>
+<path class="line" d="{{narrow.line}}"></path>
+<path class="axis" d="M48 186H320"></path>
+<circle class="dot" cx="{{narrow.ex}}" cy="{{narrow.ey}}" r="4.5"></circle>
+<text x="42" y="14" style="text-anchor: end">16.600</text>
+<text x="42" y="72.7" style="text-anchor: end">16.400</text>
+<text x="42" y="131.3" style="text-anchor: end">16.200</text>
+<text x="42" y="190" style="text-anchor: end">16.000</text>
+<text x="48" y="208">8 Sep</text>
+<text x="179.3" y="208" style="text-anchor: middle">22 Sep</text>
+<text x="320" y="208" style="text-anchor: end">7 Oct</text>
+</svg>
+</section>
+</sc-if>
+
+<sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+<section class="card" aria-label="Prices could not load" style="min-height: 320px; display: flex; align-items: center; justify-content: center">
+<div class="msg"><div class="msg-title is-error"><svg class="ic"><use href="#i-alert"></use></svg>Couldn't load prices</div><div class="small">Check your connection, then try again.</div><button type="button" class="btn" style="margin-top: 8px; display: inline-flex; align-items: center; gap: 6px"><svg class="ic"><use href="#i-retry"></use></svg>Retry</button></div>
+</section>
+</sc-if>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"mode":{"editor":"enum","options":["filled","error"],"default":"filled"},"$preview":{"width":1440,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+var mode = this.props.mode || 'filled';
+// Weekday prices from 8 Sep to 7 Oct 2026. Only the last value, 16.400, is from the brief. null is a weekday without data.
+var offs = [0, 1, 2, 3, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 27, 28, 29];
+var vals = [16150, 16150, 16100, 16100, 16150, 16200, 16200, 16250, 16250, null, null, 16300, 16300, 16350, 16350, 16400, 16400, 16450, 16450, 16400, 16400, 16400];
+var build = function (x0, x1, yBase, yTop) {
+var line = '', area = '', seg = [], ex = 0, ey = 0;
+var flush = function () {
+if (!seg.length) return;
+var pts = seg.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L');
+line += 'M' + pts;
+area += 'M' + pts + 'V' + yBase + 'H' + seg[0][0].toFixed(1) + 'Z';
+seg = [];
+};
+offs.forEach(function (o, i) {
+if (vals[i] === null) { flush(); return; }
+ex = x0 + (o / 29) * (x1 - x0);
+ey = yBase - ((vals[i] - 16000) / 600) * (yBase - yTop);
+seg.push([ex, ey]);
+});
+flush();
+return { line: line, area: area, ex: ex, ey: ey };
+};
+return {
+theme: this.props.theme || 'light',
+themeIcon: this.props.theme === 'dark' ? '#i-moon' : '#i-sun',
+themeName: this.props.theme === 'dark' ? 'Dark' : 'Light',
+isFilled: mode !== 'error',
+isError: mode === 'error',
+wide: build(64, 1264, 256, 16),
+narrow: build(48, 320, 186, 10)
+};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "ignorePatterns": [
+    ".agent/**",
+    ".agents/**",
+    ".claude/**",
+    ".beads/**",
+    "design/**",
+    "docs/**",
+    "*.md",
+    "tools/oxlint/anti-slop/**",
+    "apps/web/public/provinces.json"
+  ]
+}

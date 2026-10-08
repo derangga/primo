@@ -1,0 +1,35 @@
+{
+  "name": "primo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "check": "bun run format && bun run lint && bun run types && bun run test && bun run doctor",
+    "format": "oxfmt --check",
+    "lint": "oxlint",
+    "types": "bun run --filter '*' types && tsc -p . && effect-language-service diagnostics --project tsconfig.json",
+    "test": "vitest run",
+    "doctor": "react-doctor apps/web --blocking error --no-telemetry --no-supply-chain",
+    "deploy": "alchemy deploy --stage prod",
+    "destroy": "alchemy destroy --stage prod",
+    "logs": "alchemy logs --stage prod"
+  },
+  "devDependencies": {
+    "@effect/language-service": "0.87.4",
+    "@effect/platform-bun": "4.0.2",
+    "@effect/platform-node": "4.0.2",
+    "@effect/vitest": "4.0.2",
+    "@oxlint/plugins": "1.87.0",
+    "@types/node": "22.20.5",
+    "alchemy": "2.0.0-beta.81",
+    "effect": "4.0.2",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0",
+    "react-doctor": "0.9.17",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3"
+  }
+}
