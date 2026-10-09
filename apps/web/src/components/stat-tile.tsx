@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Card } from "~/components/ui/card";
 
-// An overline label, one figure and one supporting line (.card.tile).
+// An overline label, one figure and one supporting line.
 export function StatTile(props: {
   readonly label: string;
   readonly figure: ReactNode;

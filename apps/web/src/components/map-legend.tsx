@@ -1,40 +1,21 @@
 import { cn } from "~/lib/utils";
 
-export type LegendKind = "price" | "power";
-
-// The words and the colour order of each tab (DESIGN.UI.md, Map legend). Blue is the good end, so on
-// Purchasing Power the strip runs the other way, from bucket 5 ("Buys less") to bucket 1.
-const legends = {
-  price: {
-    low: "Cheaper",
-    high: "Pricier",
-    label:
-      "Colour scale from cheaper to pricier than the national price: below -15%, -15% to -5%, within 5%, +5% to +15%, above +15%",
-    buckets: [1, 2, 3, 4, 5],
-  },
-  power: {
-    low: "Buys less",
-    high: "Buys more",
-    label:
-      "Colour scale from buying less to buying more than the median province: below -15%, -15% to -5%, within 5%, +5% to +15%, above +15%",
-    buckets: [5, 4, 3, 2, 1],
-  },
-} as const;
-
 // HTML below the map (DESIGN.UI.md, Map legend): the five buckets joined, the band edges at the
 // joints, a caption at each end, and "No data" as its own hatched swatch.
-export function MapLegend(props: { readonly kind: LegendKind }) {
-  const legend = legends[props.kind];
-
+export function MapLegend() {
   return (
     <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-2">
-      <div role="img" aria-label={legend.label} className="flex flex-col gap-1">
+      <div
+        role="img"
+        aria-label="Colour scale from cheaper to pricier than the national price: below -15%, -15% to -5%, within 5%, +5% to +15%, above +15%"
+        className="flex flex-col gap-1"
+      >
         <div className="flex justify-between text-[11px] text-text-2">
-          <span>{legend.low}</span>
-          <span>{legend.high}</span>
+          <span>Cheaper</span>
+          <span>Pricier</span>
         </div>
         <div className="grid grid-cols-[repeat(5,56px)] gap-px">
-          {legend.buckets.map((n, index) => (
+          {[1, 2, 3, 4, 5].map((n, index) => (
             <i
               key={n}
               className={cn(

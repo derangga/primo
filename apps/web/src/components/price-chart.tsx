@@ -40,8 +40,8 @@ export function PriceChart(props: {
     const [start, end] = priceDomain(rows);
 
     // The time scale ticks every 12 hours over a week or so, which repeats a day's label, so a short range
-    // ticks every day it has a row. On a phone the labels are the first, the middle and the last day, as
-    // in the mockup. Longer ranges on wider screens leave the ticks to the scale.
+    // ticks every day it has a row. On a phone the labels are the first, the middle and the last day.
+    // Longer ranges on wider screens leave the ticks to the scale.
     const tickFormat = { size: 0, format: (value: Date) => formatDayMonth(value) };
     const first = rows.at(0)?.date;
     const middle = rows.at(Math.floor(rows.length / 2))?.date;
@@ -84,7 +84,7 @@ export function PriceChart(props: {
           axis: {
             line: { stroke: "var(--color-border-strong)", strokeWidth: 1 },
             ticks: xTicks,
-            // When labels collide the first and last survive, as in the mockup's phone chart.
+            // When labels collide the first and last survive.
             tickLabels: { thin: { priority: "ends" } },
           },
         },

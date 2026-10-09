@@ -3,7 +3,7 @@ import { rangeLabels } from "~/range";
 import { Field } from "~/components/picker";
 import { cn } from "~/lib/utils";
 
-// Three segments, one always selected (.seg). Selected is aria-pressed; from 640 px it is as wide as
+// Three segments, one always selected. Selected is aria-pressed; from 640 px it is as wide as
 // its segments, below that it fills its row with equal segments.
 export function RangeControl(props: {
   readonly value: RangeDays;

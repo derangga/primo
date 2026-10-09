@@ -14,7 +14,6 @@ export default defineConfig({
     ".roo/**",
     ".windsurf/**",
     ".beads/**",
-    "design/**",
     "tools/oxlint/anti-slop/**",
   ],
   jsPlugins: [

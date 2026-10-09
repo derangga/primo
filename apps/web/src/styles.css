@@ -87,8 +87,8 @@
   }
 }
 
-/* Controls are 44 px high on a phone. tokens.css is copied unchanged from design/, and it is not in a
-   layer, so the override sits outside @layer base too. */
+/* Controls are 44 px high on a phone. tokens.css is not in a layer, so the override
+   sits outside @layer base too. */
 @media (max-width: 639px) {
   :root {
     --control-h: 44px;
@@ -212,7 +212,7 @@
   stroke-dasharray: 3 2;
 }
 
-/* The legend's "No data" swatch, from .nd in design/components.css. */
+/* The legend's "No data" swatch. */
 .no-data-swatch {
   background:
     repeating-linear-gradient(135deg, var(--bucket-hatch) 0 1.5px, transparent 1.5px 5px),

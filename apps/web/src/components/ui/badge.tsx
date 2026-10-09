@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "~/lib/utils";
 
-// .badge, .badge.is-warn and .badge.is-error from design/components.css.
+// The badge in its neutral, warning and error colours.
 const badgeVariants = cva(
   "inline-flex h-7 items-center gap-1.5 rounded-pill border px-2.5 text-sm whitespace-nowrap",
   {

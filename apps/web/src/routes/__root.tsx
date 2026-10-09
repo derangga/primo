@@ -41,7 +41,7 @@ function RootLayout() {
   return (
     <>
       <Header />
-      <main className="mx-auto flex max-w-(--content-max) flex-col gap-3 p-4 pb-[calc(var(--space-4)+64px+env(safe-area-inset-bottom))] sm:gap-4 sm:p-6">
+      <main className="mx-auto flex max-w-(--content-max) flex-col gap-3 p-4 sm:gap-4 sm:p-6">
         <Outlet />
       </main>
     </>

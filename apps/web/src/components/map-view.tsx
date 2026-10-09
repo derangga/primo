@@ -8,7 +8,7 @@ import type { MapInteraction } from "~/components/province-map";
 import { SummaryPanel } from "~/components/summary-panel";
 import { useMapData } from "~/use-map-data";
 
-// The Map tab's content: the map card and the summary panel beside it (above it below 1024 px).
+// The map section's content: the map card and the summary panel beside it (above it below 1024 px).
 // `requestedDate` is the URL's date, which may have no data: the newest shows then. `area` is the
 // selected province from the URL, and `onArea` is how the map asks to change it.
 export function MapView(props: {
@@ -57,7 +57,6 @@ export function MapView(props: {
         title={`${commodityName(commodity)}, price vs national average`}
         cardLabel="Price map"
         date={date}
-        legend="price"
         features={features}
         interaction={interaction}
         ariaLabel={`Map of Indonesia's 34 provinces coloured by ${commodityName(commodity)} price against the national price`}

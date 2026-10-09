@@ -6,7 +6,7 @@ export const Popover = PopoverPrimitive.Root;
 
 export const PopoverTrigger = PopoverPrimitive.Trigger;
 
-// .pop from design/components.css. It fades in and scales from 0.97 at the trigger.
+// The popover surface. It fades in and scales from 0.97 at the trigger.
 export function PopoverContent(props: ComponentProps<typeof PopoverPrimitive.Content>) {
   const { className, sideOffset = 6, align = "start", ...rest } = props;
 

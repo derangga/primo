@@ -4,7 +4,6 @@
     ".agents/**",
     ".claude/**",
     ".beads/**",
-    "design/**",
     "docs/**",
     "*.md",
     "tools/oxlint/anti-slop/**",

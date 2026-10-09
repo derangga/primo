@@ -53,7 +53,7 @@ function ChartSkeleton() {
   );
 }
 
-// The Chart tab's content: four tiles and the area chart for one commodity in one area over a range.
+// The chart section's content: four tiles and the area chart for one commodity in one area over a range.
 // One failure of any kind is one message that replaces them all.
 export function ChartView(props: {
   readonly commodity: CommodityId;
@@ -92,7 +92,7 @@ export function ChartView(props: {
       <MessageCard>
         <div className="flex flex-col items-center gap-2 text-center text-text-2">
           <div className="font-medium text-text">No prices for this selection</div>
-          <p>Try another commodity, area or range.</p>
+          <p>Try another commodity, province or range.</p>
         </div>
       </MessageCard>
     );

@@ -9,7 +9,7 @@ export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
-// .pop from design/components.css. It fades in and scales from 0.97 at the trigger.
+// The popover surface. It fades in and scales from 0.97 at the trigger.
 export function DropdownMenuContent(props: ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   const { className, sideOffset = 6, ...rest } = props;
 

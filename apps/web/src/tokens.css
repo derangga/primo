@@ -22,7 +22,7 @@
   --color-on-accent: #ffffff;
   --color-accent-soft: #ecedf8;
 
-  /* Map buckets. 1 is good for the buyer, 5 is bad. Reverse the mapping, not the tokens, on Purchasing Power. */
+  /* Map buckets. 1 is good for the buyer, 5 is bad. */
   --bucket-1: #1f5fa8;
   --bucket-2: #86b4e0;
   --bucket-3: #cdd0d6;

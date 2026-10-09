@@ -9,7 +9,7 @@ export const SheetTrigger = Dialog.Trigger;
 // How far down a drag on the header must go to close the sheet.
 const closeDragPx = 80;
 
-// .bsheet from design/components.css, for phones. A scrim covers the page, the sheet slides up
+// The bottom sheet, for phones. A scrim covers the page, the sheet slides up
 // from the bottom edge, and the grab handle and title can be dragged down to close it. Radix moves
 // focus in, returns it to the trigger and closes on the scrim, the close button or Escape.
 export function SheetContent(props: {

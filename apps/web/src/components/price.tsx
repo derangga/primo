@@ -9,7 +9,7 @@ const sizes = {
   tile: "text-(length:--num-md) sm:text-(length:--num-lg)",
 };
 
-// "Rp 16.400/kg" (.num in design/components.css): "Rp" at weight 400 in secondary text, the figure at
+// "Rp 16.400/kg": "Rp" at weight 400 in secondary text, the figure at
 // 600, and "/kg" at 0.45 of the figure on the headline size and 13 px on the smaller ones.
 export function Price(props: {
   readonly rupiah: number;
@@ -45,7 +45,7 @@ const tone = {
   flat: "text-text-2",
 };
 
-// The change of `value` against `reference` (.delta): colour, an arrow, a sign, rupiah then percent.
+// The change of `value` against `reference`: colour, an arrow, a sign, rupiah then percent.
 export function Delta(props: {
   readonly value: number;
   readonly reference: number;

@@ -1,10 +1,8 @@
 import type { AreaId, CommodityId, IsoDate, Snapshot } from "@primo/contract/schemas";
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { provinceName } from "~/areas";
 import { bucket, priceBucketLabel } from "~/buckets";
 import { BucketSwatch } from "~/components/bucket-swatch";
-import { Icon } from "~/components/icon";
 import { Delta, Price } from "~/components/price";
 import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -17,7 +15,7 @@ const overline = "text-xs font-medium tracking-[0.06em] text-text-2 uppercase";
 
 const divider = <div className="h-px bg-border" />;
 
-// The Map tab's panel beside the map (DESIGN.UI.md, Summary panel). It is built from a card and tiles.
+// The panel beside the map (DESIGN.UI.md, Summary panel). It is built from a card and tiles.
 // `snapshot` is undefined while the prices load; the caller leaves the panel out when the request failed.
 export function SummaryPanel(props: {
   readonly commodity: CommodityId;
@@ -86,15 +84,6 @@ export function SummaryPanel(props: {
         )}
         <Row label="Date">{formatDate(date)}</Row>
       </div>
-      {divider}
-      <Link
-        to="/chart"
-        search={{ commodity, area, range: undefined }}
-        className="inline-flex items-center gap-1 font-medium text-accent no-underline"
-      >
-        View chart
-        <Icon name="right" />
-      </Link>
     </Card>
   );
 }

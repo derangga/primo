@@ -1,7 +1,7 @@
 import type { IsoDate } from "@primo/contract/schemas";
 import { ErrorMessage } from "~/components/error-message";
 import { MapAttribution } from "~/components/map-attribution";
-import { MapLegend, type LegendKind } from "~/components/map-legend";
+import { MapLegend } from "~/components/map-legend";
 import { ProvinceMap, type MapInteraction } from "~/components/province-map";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -46,13 +46,12 @@ function MapError(props: { readonly retrying: boolean; readonly onRetry: () => v
   );
 }
 
-// The map card both map tabs share: title, the date the colours are for, the map, the legend and the
+// The map card: title, the date the colours are for, the map, the legend and the
 // attribution. The legend goes with the map, not the data, so it shows in every state. The outlines
 // are a skeleton until `features` arrive, and `interaction` is null until the prices do.
 export function MapCard(props: {
   readonly title: string;
   readonly date: IsoDate | undefined;
-  readonly legend: LegendKind;
   readonly features: ReadonlyArray<ProvinceFeature> | undefined;
   readonly interaction: MapInteraction | null;
   readonly ariaLabel: string;
@@ -61,12 +60,11 @@ export function MapCard(props: {
   readonly failed: boolean;
   readonly retrying: boolean;
   readonly onRetry: () => void;
-  readonly className?: string;
 }) {
   const { title, date, features, interaction, dimmed } = props;
 
   return (
-    <Card aria-label={props.cardLabel} className={props.className}>
+    <Card aria-label={props.cardLabel}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {date === undefined ? null : (
@@ -88,7 +86,7 @@ export function MapCard(props: {
         )}
         {props.failed ? <MapError retrying={props.retrying} onRetry={props.onRetry} /> : null}
       </div>
-      <MapLegend kind={props.legend} />
+      <MapLegend />
       <MapAttribution />
     </Card>
   );

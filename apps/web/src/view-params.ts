@@ -7,52 +7,37 @@ const decodeCommodity = Schema.decodeUnknownOption(CommodityId);
 
 const decodeDate = Schema.decodeUnknownOption(IsoDate);
 
-// A province on the Map tab: 1..34. AreaId also allows 0, the national figure, which is not a province.
-const decodeArea = Schema.decodeUnknownOption(AreaId);
-
+// A province: 1..34. AreaId also allows 0, the national figure, which the URL says by leaving the area out.
 const decodeProvince = Schema.decodeUnknownOption(
   AreaId.pipe(Schema.check(Schema.makeFilter((areaId: number) => areaId !== 0))),
 );
 
-export type MapSearch = {
-  readonly commodity?: CommodityId | undefined;
-  readonly date?: IsoDate | undefined;
-  readonly area?: AreaId | undefined;
-};
-
-// A param that fails is returned as an explicit undefined, not left out: the router merges what this
-// returns over the raw URL params, so a missing key would let the invalid value through.
-export function validateMapSearch(search: {
-  readonly commodity?: unknown;
-  readonly date?: unknown;
-  readonly area?: unknown;
-}): MapSearch {
-  return {
-    commodity: Option.getOrUndefined(decodeCommodity(search["commodity"])),
-    date: Option.getOrUndefined(decodeDate(search["date"])),
-    area: Option.getOrUndefined(decodeProvince(search["area"])),
-  };
-}
-
-// The Chart tab's range in days, as the series endpoint takes it: 7 days, 1 month, 3 months.
+// The chart's range in days, as the series endpoint takes it: 7 days, 1 month, 3 months.
 const decodeRange = Schema.decodeUnknownOption(Schema.Literals([7, 30, 90]));
 
 export type Range = 7 | 30 | 90;
 
-export type ChartSearch = {
+// The commodity and the province are shared by the map and the chart. The date is the map's and the
+// range is the chart's.
+export type ViewSearch = {
   readonly commodity?: CommodityId | undefined;
   readonly area?: AreaId | undefined;
+  readonly date?: IsoDate | undefined;
   readonly range?: Range | undefined;
 };
 
-export function validateChartSearch(search: {
+// A param that fails is returned as an explicit undefined, not left out: the router merges what this
+// returns over the raw URL params, so a missing key would let the invalid value through.
+export function validateViewSearch(search: {
   readonly commodity?: unknown;
   readonly area?: unknown;
+  readonly date?: unknown;
   readonly range?: unknown;
-}): ChartSearch {
+}): ViewSearch {
   return {
     commodity: Option.getOrUndefined(decodeCommodity(search["commodity"])),
-    area: Option.getOrUndefined(decodeArea(search["area"])),
+    area: Option.getOrUndefined(decodeProvince(search["area"])),
+    date: Option.getOrUndefined(decodeDate(search["date"])),
     range: Option.getOrUndefined(decodeRange(search["range"])),
   };
 }

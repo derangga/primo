@@ -2,50 +2,41 @@
 // https://www.bi.go.id/hargapangan/WebSite/TabelHarga/GetRefProvince
 // https://www.bi.go.id/hargapangan/WebSite/TabelHarga/GetRefCommodityAndCategory
 // Names are trimmed; PIHPS sends "Cabai Merah Keriting " with a trailing space. Every price is per kg.
-
-// ump2026: provincial minimum wage 2026 in whole rupiah per month, effective 2026-01-01 (PP 49/2025).
-// No Kemnaker page was readable (its list was published on Instagram), so every figure is one that
-// at least two independent outlets agree on:
-// https://finance.detik.com/berita-ekonomi-bisnis/d-8295123/daftar-lengkap-ump-di-38-provinsi-yang-langsung-berlaku-januari-2026
-// https://www.idxchannel.com/economics/catat-ini-daftar-lengkap-kenaikan-upah-minimum-provinsi-2026/all
-// https://metrotvnews.com/read/KXyCWXPX-berlaku-mulai-januari-kemnaker-rilis-daftar-resmi-ump-2026-di-38-provinsi
-// Sumatera Utara uses the governor decree 188.44/896/KPTS/2025 (3,228,971); the Kemnaker list says 3,228,949.
-// Papua and Papua Barat use their own UMP, not that of the four newer Papua provinces (docs/adr/0005).
 export const provinces = [
-  { id: 1, name: "Aceh", ump2026: 3_932_552 },
-  { id: 2, name: "Sumatera Utara", ump2026: 3_228_971 },
-  { id: 3, name: "Sumatera Barat", ump2026: 3_182_955 },
-  { id: 4, name: "Riau", ump2026: 3_780_495 },
-  { id: 5, name: "Kepulauan Riau", ump2026: 3_879_520 },
-  { id: 6, name: "Jambi", ump2026: 3_471_497 },
-  { id: 7, name: "Bengkulu", ump2026: 2_827_250 },
-  { id: 8, name: "Sumatera Selatan", ump2026: 3_942_963 },
-  { id: 9, name: "Kepulauan Bangka Belitung", ump2026: 4_035_000 },
-  { id: 10, name: "Lampung", ump2026: 3_047_734 },
-  { id: 11, name: "Banten", ump2026: 3_100_881 },
-  { id: 12, name: "Jawa Barat", ump2026: 2_317_601 },
-  { id: 13, name: "DKI Jakarta", ump2026: 5_729_876 },
-  { id: 14, name: "Jawa Tengah", ump2026: 2_327_386 },
-  { id: 15, name: "DI Yogyakarta", ump2026: 2_417_495 },
-  { id: 16, name: "Jawa Timur", ump2026: 2_446_880 },
-  { id: 17, name: "Bali", ump2026: 3_207_459 },
-  { id: 18, name: "Nusa Tenggara Barat", ump2026: 2_673_861 },
-  { id: 19, name: "Nusa Tenggara Timur", ump2026: 2_455_898 },
-  { id: 20, name: "Kalimantan Barat", ump2026: 3_054_552 },
-  { id: 21, name: "Kalimantan Selatan", ump2026: 3_725_000 },
-  { id: 22, name: "Kalimantan Tengah", ump2026: 3_686_138 },
-  { id: 23, name: "Kalimantan Timur", ump2026: 3_762_431 },
-  { id: 24, name: "Kalimantan Utara", ump2026: 3_775_243 },
-  { id: 25, name: "Gorontalo", ump2026: 3_405_144 },
-  { id: 26, name: "Sulawesi Selatan", ump2026: 3_921_088 },
-  { id: 27, name: "Sulawesi Tenggara", ump2026: 3_306_496 },
-  { id: 28, name: "Sulawesi Tengah", ump2026: 3_179_565 },
-  { id: 29, name: "Sulawesi Utara", ump2026: 4_002_630 },
-  { id: 30, name: "Sulawesi Barat", ump2026: 3_315_934 },
-  { id: 31, name: "Maluku", ump2026: 3_334_490 },
-  { id: 32, name: "Maluku Utara", ump2026: 3_510_240 },
-  { id: 33, name: "Papua", ump2026: 4_436_283 },
-  { id: 34, name: "Papua Barat", ump2026: 3_841_000 },
+  { id: 1, name: "Aceh" },
+  { id: 2, name: "Sumatera Utara" },
+  { id: 3, name: "Sumatera Barat" },
+  { id: 4, name: "Riau" },
+  { id: 5, name: "Kepulauan Riau" },
+  { id: 6, name: "Jambi" },
+  { id: 7, name: "Bengkulu" },
+  { id: 8, name: "Sumatera Selatan" },
+  { id: 9, name: "Kepulauan Bangka Belitung" },
+  { id: 10, name: "Lampung" },
+  { id: 11, name: "Banten" },
+  { id: 12, name: "Jawa Barat" },
+  { id: 13, name: "DKI Jakarta" },
+  { id: 14, name: "Jawa Tengah" },
+  { id: 15, name: "DI Yogyakarta" },
+  { id: 16, name: "Jawa Timur" },
+  { id: 17, name: "Bali" },
+  { id: 18, name: "Nusa Tenggara Barat" },
+  { id: 19, name: "Nusa Tenggara Timur" },
+  { id: 20, name: "Kalimantan Barat" },
+  { id: 21, name: "Kalimantan Selatan" },
+  { id: 22, name: "Kalimantan Tengah" },
+  { id: 23, name: "Kalimantan Timur" },
+  { id: 24, name: "Kalimantan Utara" },
+  { id: 25, name: "Gorontalo" },
+  { id: 26, name: "Sulawesi Selatan" },
+  { id: 27, name: "Sulawesi Tenggara" },
+  { id: 28, name: "Sulawesi Tengah" },
+  { id: 29, name: "Sulawesi Utara" },
+  { id: 30, name: "Sulawesi Barat" },
+  { id: 31, name: "Maluku" },
+  { id: 32, name: "Maluku Utara" },
+  { id: 33, name: "Papua" },
+  { id: 34, name: "Papua Barat" },
 ] as const;
 
 export const categories = [

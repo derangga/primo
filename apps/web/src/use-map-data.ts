@@ -11,7 +11,7 @@ const hasFailed = (query: {
   readonly errorUpdateCount: number;
 }) => query.isError || (query.data === undefined && query.errorUpdateCount > 0);
 
-// What the Map and Purchasing Power tabs both load: the outlines, the dates, and the snapshot of the
+// What the map loads: the outlines, the dates, and the snapshot of the
 // commodity on `requestedDate`, which may have no data: the newest shows then.
 export function useMapData(commodity: CommodityId, requestedDate: IsoDate | undefined) {
   const provinces = useQuery(provincesOptions);

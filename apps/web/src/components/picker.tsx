@@ -6,7 +6,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
 import type { PickerEntry } from "~/picker-entries";
 
-// An overline label above its control (.field and .overline in design/components.css).
+// An overline label above its control.
 export function Field(props: { readonly label: string; readonly children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-1 max-sm:w-full">
@@ -18,7 +18,7 @@ export function Field(props: { readonly label: string; readonly children: ReactN
   );
 }
 
-// The trigger of every picker (.ctl): the current value and a chevron. `className` sets its width.
+// The trigger of every picker: the current value and a chevron. `className` sets its width.
 // While the options load it is disabled with a skeleton bar in place of the value. Radix passes
 // its trigger props through, so the date picker's sheet and popover use it too.
 export function PickerTrigger(

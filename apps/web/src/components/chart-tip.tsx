@@ -2,7 +2,7 @@ import type { IsoDate } from "@primo/contract/schemas";
 import { formatDate } from "~/date-badge-state";
 import { formatRupiah } from "~/format";
 
-// The Chart tab's tooltip (.tip): the date, then a line sample with what the line is, and the price.
+// The chart's tooltip: the date, then a line sample with what the line is, and the price.
 export function ChartTip(props: {
   readonly date: IsoDate;
   readonly label: string;

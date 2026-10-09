@@ -41,7 +41,7 @@ tools/oxlint/anti-slop/   vendored lint plugin source
 packages/
   contract/               imported by both apps; depends only on effect
     src/
-      reference.ts        provinces, commodities, UMP 2026 (constants)
+      reference.ts        provinces, commodities (constants)
       schemas.ts          AreaId, CommodityId, IsoDate, Rupiah, Snapshot, SeriesPoint
       errors.ts           StorageUnavailable
       api.ts              PricesApi: the HttpApi definition
@@ -68,7 +68,7 @@ apps/
       queries.ts          effect-query options
       buckets.ts          percent-band function
       components/ui/      shadcn components, only the ones used
-      routes/             __root, index (map), chart, purchasing-power
+      routes/             __root, index (the one page: map and chart)
     test/
       buckets.test.ts
 ```
@@ -96,11 +96,11 @@ errors
   StorageUnavailable {}                     the API could not read D1; part of the contract, HTTP 503
 ```
 
-`packages/contract/src/reference.ts` holds the 34 provinces, the 31 commodities with their parent category, and UMP 2026 per province as plain constants. They change at most once a year, so they are not database tables. `AreaId` and `CommodityId` schemas are derived from these constants.
+`packages/contract/src/reference.ts` holds the 34 provinces, and the 31 commodities with their parent category, as plain constants. They change at most once a year, so they are not database tables. `AreaId` and `CommodityId` schemas are derived from these constants.
 
 ## Database
 
-One table. Provinces, commodities and UMP live in code.
+One table. Provinces and commodities live in code.
 
 ```sql
 CREATE TABLE prices (
@@ -237,8 +237,8 @@ Run it before the first cron. It also works if BI turns out to block Cloudflare 
 
 The website has no server logic. It is a shell that the browser fills with data from the API.
 
-- Each route's title, meta description, heading, tabs and filter bar are in the HTML. This is what a search engine reads.
-- The three routes are prerendered at build time, so Cloudflare serves them as static files and a page load costs no Worker CPU.
+- The page's title, meta description, headings and filters are in the HTML. This is what a search engine reads.
+- The one route, `/`, is prerendered at build time, so Cloudflare serves it as a static file and a page load costs no Worker CPU.
 - Prices are not in the HTML. Routes have no loader. Components call `useQuery` and show a skeleton until data arrives.
 - The backend's URL reaches the browser as a build-time variable (`VITE_API_URL`).
 
@@ -280,44 +280,39 @@ Call graph for one endpoint. The other two have the same shape.
 - **TanStack Query owns client retry and caching.** `retry: 1`, and `staleTime` of one hour, because the data changes once a day.
 - **CORS allows any origin.** The API is read-only public data with no credentials, so `Access-Control-Allow-Origin: *` is enough and the backend does not need to know the website's URL.
 
-Purchasing power needs no endpoint. It is `floor(ump / price)` computed in the browser from a `Snapshot` and the UMP constants.
-
 ### Components and charts
 
-- **shadcn/ui on Tailwind v4.** Components are copied into `apps/web/src/components/ui`, only the ones the three views use: tabs, button, card, badge, skeleton, alert, tooltip, toggle group for the range control, calendar and popover for the date picker, and command with popover for the grouped commodity and area pickers. The design system's CSS custom properties are shadcn's theme variables.
-- **TanStack Charts draws everything.** The province map, the area chart and the ranking bars are all SVG from `@tanstack/charts`. Version 1.0.0 is days old, so the map is built first to find problems early.
+- **shadcn/ui on Tailwind v4.** Components are copied into `apps/web/src/components/ui`, only the ones the page uses: button, card, badge, skeleton, alert, tooltip, toggle group for the range control, calendar and popover for the date picker, and command with popover for the grouped commodity and area pickers. The design system's CSS custom properties are shadcn's theme variables.
+- **TanStack Charts draws everything.** The province map and the area chart are both SVG from `@tanstack/charts`. Version 1.0.0 is days old, so the map is built first to find problems early.
 
 ### Interface
 
-Surfaces and the moves between them:
+Surfaces and the moves between them. There is one page. Until 2026-10-09 the map and the chart were separate tabs, and a third tab showed purchasing power against the provincial minimum wage; that tab was dropped.
 
 ```
-Header                 title, tabs (Map / Chart / Purchasing Power), data-date badge, theme switcher
+Header                 title, data-date badge, theme switcher
   needs: GET /dates
 
--> Map  (/)                                 search: commodity, date
-  -> FilterBar         commodity picker, province picker, date picker with previous / next / Latest
-  -> MapPanel          34 provinces coloured by bucket, legend
-     -> select a province                   search: + area
-  -> SummaryPanel      national average, cheapest, most expensive
-     -> with a province selected: its price, difference from national, "View chart"
-        -> Chart, same commodity and area
+-> Home  (/)                                search: commodity, area, date, range
+  -> FilterBar         commodity picker, province picker (All provinces + 34)
+     shared by both sections below
 
--> Chart  (/chart)                          search: commodity, area, range
-  -> FilterBar         commodity picker, area picker (National + 34), range (7 days / 1 month / 3 months)
-  -> StatTiles         current, change over the range, lowest, highest
-  -> ChartPanel        one area chart
+  -> Map section       heading "Prices by province", date picker with previous / next / Latest
+    -> MapPanel        34 provinces coloured by bucket, legend
+       -> select a province                 search: + area
+    -> SummaryPanel    national average, cheapest, most expensive
+       -> with a province selected: its price, difference from national
 
--> Purchasing Power  (/purchasing-power)    search: commodity, date
-  -> FilterBar         commodity picker (defaults to Beras), date picker
-  -> RankingBars       34 provinces sorted by kg per UMP, median line; hover shows price and UMP
-  -> MapPanel          same map component, coloured by purchasing power
+  -> Chart section     heading "Price trend", range (7 days / 1 month / 3 months)
+    -> StatTiles       current, change over the range, lowest, highest
+    -> ChartPanel      one area chart, of the selected province or of the national figure
 ```
 
-- **All view state is in the URL search params.** Commodity, date, area and range are validated by the router with the schemas from `packages/contract/src`. An invalid or missing param falls back to its default: Beras, the newest date, National, 1 month.
+- **All view state is in the URL search params.** Commodity, area, date and range are validated by the router with the schemas from `packages/contract/src`. An invalid or missing param falls back to its default: Beras, no province, the newest date, 1 month.
+- **The commodity and the province are shared.** One `area` param selects the province on the map and picks the chart's series. With no province the map has nothing selected and the chart shows the national figure (area 0). Area 0 is never written to the URL.
+- **The date is the map's and the range is the chart's.** Each control sits in its own section's heading.
 - **The commodity picker is grouped.** Ten categories, each with its variants beneath it.
 - **The date picker only offers dates from `GET /dates`.** Weekends and holidays cannot be selected, so "no data for this date" is not a state the user can reach.
-- **`MapPanel` is one component used twice.** It takes a value per area and a bucket function.
 
 Every way the content can be absent, per surface:
 
@@ -327,11 +322,10 @@ Every way the content can be absent, per surface:
 | MapPanel | Province outlines in grey | Message with a Retry button, outlines stay | A province with no row gets the "No data" bucket |
 | SummaryPanel | Skeleton lines | Hidden, the map carries the error | "No data for this province on this date" when the selected area has no row |
 | StatTiles, ChartPanel | Skeleton in the final layout | Message with Retry | Gaps in the line where days are missing, no interpolation |
-| RankingBars | Skeleton bars | Message with Retry | Provinces without a price are listed last as "No data" |
 
 ### Map buckets
 
-`buckets.ts` has one function, used for prices and for purchasing power.
+`buckets.ts` has one function.
 
 ```
 bucket(value, reference): Bucket
@@ -344,9 +338,8 @@ bucket(value, reference): Bucket
   value missing         no-data
 ```
 
-- On the Map tab the reference is the national price from PIHPS (area 0).
-- On the Purchasing Power tab the reference is the median of the 34 provinces. There is no national UMP, so there is no national figure to divide. This replaces the "national figure marked" wording from the grilling round.
-- Colours are a blue to orange diverging scale with a hatched "No data" fill. On the Purchasing Power tab the scale flips, because higher is better. The palette, its contrast figures and the flip rule are in `DESIGN.UI.md`.
+- The reference is the national price from PIHPS (area 0).
+- Colours are a blue to orange diverging scale with a hatched "No data" fill. The palette and its contrast figures are in `DESIGN.UI.md`.
 
 ### Map shapes
 
@@ -439,7 +432,8 @@ Each step ends with something you can run.
 6. **Website shell.** Tailwind, shadcn, routes, header, the derived client, and the badge from `GET /dates`.
 7. **Map tab.** `GET /snapshot`, `provinces.json`, buckets. This is the first use of TanStack Charts and its riskiest.
 8. **Chart tab.** `GET /series`.
-9. **Purchasing Power tab.** Reuses the snapshot and the map.
+9. **Purchasing Power tab.** Reuses the snapshot and the map. Removed on 2026-10-09.
+10. **One page.** The Map and Chart tabs become two sections of `/` that share the commodity and the province.
 
 ## Still to verify
 
@@ -455,6 +449,6 @@ These are assumptions the design rests on. Each has a fallback.
 | TanStack Charts 1.0 can draw 34 provinces with hover and selection | 7 | Draw the map as plain SVG with d3-geo and keep TanStack Charts for the charts | Confirmed, 2026-10-09, with `@tanstack/charts` 1.1.0 (the version bun resolved), except touch. `geoShape` with a Mercator fit draws the map responsively; a per-province `fill` takes `var(--bucket-N)`, `url(#hatch)` or `var(--skeleton)` and each reaches the DOM unchanged. A `states` entry on `focus: "primary"` gives the hover outline. `keyedSelection`, controlled by the `area` search param, with three `whenSelected` marks gives the two rings and the name label. The label is a `text` mark: it needs scales, so it uses two fixed linear scales over a 1000 by 400 box, and the labels are projected with the same Mercator fit (zero inset and margin), which puts each one at its province centre at any card width. `renderTooltipBody` renders the `.tip` HTML; the tooltip needs `sticky: false` (a click selects, not pins), `anchor: "pointer"` and `focusRing: false` (the default ring adds a dot at the province centre). It flips to the left near the right edge. Not seen: a tap on a touch device (the browser tool used here sends mouse events only). |
 | A 170 KB string fits one D1 bound parameter | 3 | Split the batch into 5 upserts of 7 areas each, about 34 KB per query, for 41 subrequests in total | Confirmed through the REST API, 2026-10-08. The stored 2026-10-01 to 10-08 rows (6,354 rows, a 205,060-byte JSON string) went through the upsert as one bound parameter in 20 ms. The binding path held on 2026-10-09: the cron's one upsert carried about 6,500 rows. |
 | The conditional `DO UPDATE ... WHERE` avoids counting unchanged rows as writes | 5 | None needed, the budget holds either way | Confirmed, 2026-10-08. D1 reported `rows_written` 0 for an unchanged single row, for the 205 KB batch above, and for a second full backfill of 68,957 rows. A rerun costs reads only. |
-| Prerendering works under `Cloudflare.Website.Vite` | 6 | Let the website Worker render the shell per request, and measure it against 10 ms CPU | Confirmed, 2026-10-09. Alchemy's build ran TanStack Start's prerender (`/`, `/chart`, `/purchasing-power`) and uploaded the HTML with the other 17 assets. `curl` without JavaScript returns each route's title and `h1` from Cloudflare's asset layer. One setting was needed: `assets: { htmlHandling: "drop-trailing-slash" }`, because the default answered `/chart` with a 307 to `/chart/`, which is not the router's URL. |
+| Prerendering works under `Cloudflare.Website.Vite` | 6 | Let the website Worker render the shell per request, and measure it against 10 ms CPU | Confirmed, 2026-10-09. Alchemy's build ran TanStack Start's prerender (`/`, `/chart`, `/purchasing-power`) and uploaded the HTML with the other 17 assets. `curl` without JavaScript returns each route's title and `h1` from Cloudflare's asset layer. One setting was needed: `assets: { htmlHandling: "drop-trailing-slash" }`, because the default answered `/chart` with a 307 to `/chart/`, which is not the router's URL. Since 2026-10-09 `/` is the only route. |
 | GeoJSON source licence allows redistribution | 7 | Use the other candidate source from `.FINDINGS.md` | Yes, 2026-10-08. geoBoundaries gbOpen IDN ADM1 is ODbL 1.0 (OpenStreetMap), which allows redistribution with "© OpenStreetMap contributors" shown and the derived file kept under ODbL. It has the 34 pre-2022 provinces. Details in `apps/web/public/provinces.source.md`. |
-| UMP 2026 for all 34 provinces from a Kemnaker source | 2 | None, this must be found before the Purchasing Power tab | Found, 2026-10-08, but not from Kemnaker directly: its list exists only as an Instagram post. All 34 figures agree across at least two independent outlets (Detik, IDX Channel, Metro TV), and DKI Jakarta and Jawa Barat match. Sumatera Utara's decree (3,228,971) and Kemnaker's list (3,228,949) differ by Rp 22; the user chose the decree. Sources are in `reference.ts`. |
+| UMP 2026 for all 34 provinces from a Kemnaker source | 2 | None, this must be found before the Purchasing Power tab | Found, 2026-10-08, but not from Kemnaker directly: its list exists only as an Instagram post. All 34 figures agree across at least two independent outlets (Detik, IDX Channel, Metro TV), and DKI Jakarta and Jawa Barat match. Sumatera Utara's decree (3,228,971) and Kemnaker's list (3,228,949) differ by Rp 22; the user chose the decree. No longer used: the figures and their sources left `reference.ts` with the Purchasing Power tab on 2026-10-09, and are in the git history. |

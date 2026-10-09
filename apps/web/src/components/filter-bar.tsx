@@ -3,8 +3,7 @@ import type { ReactNode } from "react";
 import { Field, Picker } from "~/components/picker";
 import { commodityEntries, commodityName } from "~/commodities";
 
-// Every tab's filters start with the commodity. The rest are the tab's own and come as children, in
-// the order they should appear: the Map's province and date, the Chart's area and range.
+// The filters the map and the chart share: the commodity, then the province, which comes as children.
 export function FilterBar(props: {
   readonly commodity: CommodityId;
   readonly onCommodity: (commodity: CommodityId) => void;

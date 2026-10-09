@@ -13,7 +13,7 @@ Commit messages and code comments describe the change in words. A bead id (`prim
 
 1. **Read.** `bd show <id>`, then every document section and ADR the bead names. Done when you can say what each acceptance criterion will look like when it is met.
 2. **Claim.** `bd update <id> --claim`.
-3. **Design.** For Effect code, run the `design-thinking` skill and write the call graph into the conversation before any code. For interface code, read the matching sections of `DESIGN.UI.md` and the mockup markup.
+3. **Design.** For Effect code, run the `design-thinking` skill and write the call graph into the conversation before any code. For interface code, read the matching sections of `DESIGN.UI.md` and the component it describes.
 4. **Build** the smallest change that meets every acceptance criterion.
 5. **Observe every criterion.** Run it, request it, or screenshot it. A criterion you reasoned about but did not see is unmet.
 6. **Check.** `bun run check` from the repository root passes. It formats, lints, type-checks, tests, and audits the React app.
@@ -31,6 +31,6 @@ When a lint rule blocks you, fix the code. If the rule is wrong for a whole work
 Read the one that covers your change before you edit.
 
 - `DESIGN.md`: architecture, call graphs with their error handling, the API contract, and the Free plan budgets. Read before touching the backend, the contract, or how data reaches the browser.
-- `DESIGN.UI.md`: the approved look and behaviour of every surface and state. Read before any interface work. Values come from `design/tokens.css`, never from memory.
+- `DESIGN.UI.md`: the approved look and behaviour of every surface and state. Read before any interface work. Values come from `apps/web/src/tokens.css`, never from memory.
 - `docs/adr/`: choices that look wrong but are deliberate. Read before changing the transport, the chart or component library, the ingest's retries, indexes or upsert, the province count, the lint rules, or the infrastructure.
 - `.FINDINGS.md`: the PIHPS endpoints, their response quirks, and measured limits. Read before working on ingestion.
