@@ -125,3 +125,47 @@
     animation: sk-pulse 1.2s ease-in-out infinite;
   }
 }
+
+/* The map's strokes keep their width at any map size, as DESIGN.UI.md asks of the province outlines.
+   The class is on the group; vector-effect is not inherited, so it goes on the paths. */
+.province path {
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+/* A province with no price: the hatch fill (see HatchPattern) plus a dashed border. */
+.province path[fill="url(#hatch)"] {
+  stroke-dasharray: 3 2;
+}
+
+/* The legend's "No data" swatch, from .nd in design/components.css. */
+.no-data-swatch {
+  background:
+    repeating-linear-gradient(135deg, var(--bucket-hatch) 0 1.5px, transparent 1.5px 5px),
+    var(--bucket-nodata);
+  outline: 1px dashed var(--color-border-strong);
+  outline-offset: -1px;
+}
+
+/* The map's labels (the selected province's name): a card-coloured halo so they read on any fill. */
+.province-map text {
+  stroke: var(--color-card);
+  stroke-width: 3.5px;
+  paint-order: stroke;
+  stroke-linejoin: round;
+}
+
+/* The map is not a keyboard stop (the province picker is), so a click must not leave a focus box on it. */
+.province-map svg {
+  outline: none;
+}
+
+/* Chart text: 12 px in secondary text (DESIGN.UI.md, Chart styling). */
+.price-chart text {
+  font: 12px var(--font-sans);
+  fill: var(--color-text-2);
+}
+
+.price-chart svg {
+  outline: none;
+}

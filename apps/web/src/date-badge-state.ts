@@ -44,3 +44,6 @@ export function formatDate(date: IsoDate) {
 
   return `${Number(day)} ${months[Number(month) - 1]} ${year}`;
 }
+
+// A UTC day as "8 Sep", for the chart's time axis.
+export const formatDayMonth = (date: Date) => `${date.getUTCDate()} ${months[date.getUTCMonth()]}`;

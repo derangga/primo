@@ -1,4 +1,11 @@
-import { IsoDate } from "@primo/contract/schemas";
+import {
+  AreaId,
+  IsoDate,
+  Rupiah,
+  SeriesPoint,
+  type CommodityId,
+  type Snapshot,
+} from "@primo/contract/schemas";
 import { Context, Effect, Layer, Schedule, Schema } from "effect";
 import { SqlClient } from "effect/sql/SqlClient";
 import type { PriceRow } from "./pihps.ts";
@@ -9,6 +16,12 @@ const decodeWriteResult = Schema.decodeUnknownEffect(
 );
 
 const decodeDates = Schema.decodeUnknownEffect(Schema.Array(Schema.Struct({ date: IsoDate })));
+
+const decodeSnapshotRows = Schema.decodeUnknownEffect(
+  Schema.Array(Schema.Struct({ area_id: AreaId, price: Rupiah })),
+);
+
+const decodeSeries = Schema.decodeUnknownEffect(Schema.Array(SeriesPoint));
 
 export class PriceRepo extends Context.Service<PriceRepo>()("PriceRepo", {
   make: Effect.gen(function* () {
@@ -60,7 +73,45 @@ export class PriceRepo extends Context.Service<PriceRepo>()("PriceRepo", {
       (effect) => effect.pipe(Effect.catchTag("SchemaError", (error) => Effect.die(error))),
     );
 
-    return { upsert, prune, dates };
+    // One commodity on one date for every area. The national figure is area 0; the provinces are the rest.
+    // The WHERE reads only this commodity's range of the primary key (at most 35 areas x 65 days).
+    const snapshot = Effect.fn("PriceRepo.snapshot")(
+      function* (commodityId: CommodityId, date: IsoDate) {
+        const rows = yield* sql`
+          SELECT area_id, price FROM prices WHERE commodity_id = ${commodityId} AND date = ${date}
+        `;
+
+        const decoded = yield* decodeSnapshotRows(rows);
+
+        return {
+          date,
+          national: decoded.find((row) => row.area_id === 0)?.price ?? null,
+          byArea: decoded
+            .filter((row) => row.area_id !== 0)
+            .map((row) => ({ areaId: row.area_id, price: row.price })),
+        } satisfies Snapshot;
+      },
+      // Rows in the table were written through the same schemas, so another shape is a bug here, not a D1 failure.
+      (effect) => effect.pipe(Effect.catchTag("SchemaError", (error) => Effect.die(error))),
+    );
+
+    // One commodity in one area from `since` on, oldest first. The WHERE is the primary key's prefix
+    // and a date range, so it reads at most the 65 stored days.
+    const series = Effect.fn("PriceRepo.series")(
+      function* (commodityId: CommodityId, areaId: AreaId, since: IsoDate) {
+        const rows = yield* sql`
+          SELECT date, price FROM prices
+          WHERE commodity_id = ${commodityId} AND area_id = ${areaId} AND date >= ${since}
+          ORDER BY date
+        `;
+
+        return yield* decodeSeries(rows);
+      },
+      // Rows in the table were written through the same schemas, so another shape is a bug here, not a D1 failure.
+      (effect) => effect.pipe(Effect.catchTag("SchemaError", (error) => Effect.die(error))),
+    );
+
+    return { upsert, prune, dates, snapshot, series };
   }),
 }) {
   static readonly layer = Layer.effect(this, this.make);

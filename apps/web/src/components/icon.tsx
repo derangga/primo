@@ -12,6 +12,10 @@ const paths = {
   check: "M3 7.5l2.8 2.8L11 4.5",
   clock: "M7 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM7 4v3.2l2 1.3",
   alert: "M7 1.8l5.6 10H1.4zM7 6v2.6M7 10.4v.1",
+  down: "M3 5.5l4 4 4-4",
+  left: "M8.5 3l-4 4 4 4",
+  right: "M5.5 3l4 4-4 4",
+  x: "M3.5 3.5l7 7M10.5 3.5l-7 7",
 };
 
 export type IconName = keyof typeof paths;

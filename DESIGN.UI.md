@@ -186,6 +186,8 @@ HTML below the map, not part of the chart. A joined strip of the five buckets wi
 | Map | bucket 1 to bucket 5 | "Cheaper", "Pricier" |
 | Purchasing Power | bucket 5 to bucket 1 | "Buys less", "Buys more" |
 
+The attribution "© OpenStreetMap contributors" is a caption line under the legend row inside the map card, 11 px in `--color-text-2`, underlined, linking to https://www.openstreetmap.org/copyright. The shapes file is ODbL data and the licence asks for it wherever the map shows, so the Map and Purchasing Power cards both carry it, in every state. Decided 2026-10-09.
+
 ### Tooltips (`.tip`)
 
 Card surface with `--shadow-pop`. A title line, then label and value rows with right-aligned values.
@@ -283,9 +285,10 @@ The province outlines in the mockups are simplified SVG paths in a made-up proje
 - Column and trigger widths were sized from the longest names in the brief, not from real PIHPS data.
 - The colour-blindness figures come from simulation, not from testing with colour-blind viewers.
 - TanStack Charts 1.0, against its documentation on 2026-10-08. Confirmed there: a per-feature `fill` channel on `geoShape`, `stroke`, `strokeWidth` and `strokeDasharray` options, focus states for hover, keyed selection with `whenSelected` overlays, line and area breaks at `null` values, a pointer-anchored tooltip with an offset and a placement list, a React tooltip body, a `className` on the tooltip surface, axes without baseline or tick stubs, and tick labels thinned on collision by default. Not confirmed:
-  - That a `url(#hatch)` fill reaches the DOM unchanged. The library scopes the ids of its own gradient resources with an `idPrefix` and has no pattern resource. The docs do not say what it does with other `url()` paints. A `<pattern>` defined in the page, outside the chart, is the plan.
-  - A text label positioned on a map feature, with `paint-order: stroke`.
-  - Turning off focus, selection and tooltip for the loading map.
-  - A 200 ms entrance followed by updates with no transition. The `motion` renderer takes one fallback transition for both.
+  - ~~That a `url(#hatch)` fill reaches the DOM unchanged.~~ Confirmed 2026-10-09 with `@tanstack/charts` 1.1.0: the `fill` attribute is `url(#hatch)` as written, and the `<pattern>` defined in the page outside the chart paints it. The dashed border is a CSS rule on `path[fill="url(#hatch)"]`, because `strokeDasharray` is one value for the whole mark, not a per-province channel.
+  - ~~A text label positioned on a map feature, with `paint-order: stroke`.~~ Confirmed 2026-10-09: the `text` mark places it through two fixed linear scales over the same 1000 by 400 box the Mercator fit uses, and the halo is a CSS rule on `text` inside the map (the mark has no stroke option).
+  - ~~Turning off focus, selection and tooltip for the loading map.~~ Confirmed 2026-10-09: a `geoShape` with no `states`, no `tooltip` and `keyboard: false` has no hover change, no tooltip and no keyboard stop.
+  - Loading map strokes and `vector-effect: non-scaling-stroke`. `className` lands on the group, not the paths, and `vector-effect` does not inherit, so the CSS rule is `.province path`.
+  - A 200 ms entrance followed by updates with no transition. The `motion` renderer takes one fallback transition for both. Not built, 2026-10-09: the Chart tab draws at once, with no entrance. The rest of the chart styling was seen on real data: the area is `areaY` with `y1` at the start of the y range, the day under the pointer gets the `crosshair` mark's rule and 8 px marker, and `focusRing: false` removes the library's two extra rings. Over a week or so the time scale ticks every 12 hours and repeats a label, so a short range lists its days as tick values, and on a phone the labels are the first, middle and last day.
   - Tap to show and tap elsewhere to hide the tooltip on touch.
   - `vector-effect: non-scaling-stroke` and round line caps and joins, which no mark option names. Set them with CSS on the mark's `className` if needed.

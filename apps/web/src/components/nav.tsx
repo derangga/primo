@@ -23,7 +23,7 @@ export function Nav() {
         <Link
           key={tab.to}
           to={tab.to}
-          activeOptions={{ exact: true }}
+          activeOptions={{ exact: true, includeSearch: false }}
           className="inline-flex h-[52px] flex-1 flex-col items-center justify-center gap-0.5 rounded-md text-sm font-medium whitespace-nowrap text-text-2 no-underline aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent fine-hover:hover:bg-hover fine-hover:hover:text-text sm:h-[34px] sm:flex-none sm:flex-row sm:rounded-pill sm:px-3.5 sm:text-md sm:aria-[current=page]:bg-accent sm:aria-[current=page]:text-on-accent fine-hover:sm:aria-[current=page]:hover:bg-accent fine-hover:sm:aria-[current=page]:hover:text-on-accent"
         >
           <Icon name={tab.icon} className="size-[18px] sm:hidden" />
