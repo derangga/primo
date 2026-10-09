@@ -15,9 +15,9 @@ const decodeProvince = Schema.decodeUnknownOption(
 );
 
 export type MapSearch = {
-  readonly commodity: CommodityId | undefined;
-  readonly date: IsoDate | undefined;
-  readonly area: AreaId | undefined;
+  readonly commodity?: CommodityId | undefined;
+  readonly date?: IsoDate | undefined;
+  readonly area?: AreaId | undefined;
 };
 
 // A param that fails is returned as an explicit undefined, not left out: the router merges what this
@@ -40,9 +40,9 @@ const decodeRange = Schema.decodeUnknownOption(Schema.Literals([7, 30, 90]));
 export type Range = 7 | 30 | 90;
 
 export type ChartSearch = {
-  readonly commodity: CommodityId | undefined;
-  readonly area: AreaId | undefined;
-  readonly range: Range | undefined;
+  readonly commodity?: CommodityId | undefined;
+  readonly area?: AreaId | undefined;
+  readonly range?: Range | undefined;
 };
 
 export function validateChartSearch(search: {

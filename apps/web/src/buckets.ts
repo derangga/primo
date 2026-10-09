@@ -40,6 +40,17 @@ export const priceFill: Record<Bucket, string> = {
   "no-data": "url(#hatch)",
 };
 
+// Purchasing Power: more kilograms is good for the buyer, so far-above the median is bucket 1 and
+// far-below is bucket 5. The tokens stay as they are; only the mapping from the result flips.
+export const powerFill: Record<Bucket, string> = {
+  "far-above": "var(--bucket-1)",
+  above: "var(--bucket-2)",
+  near: "var(--bucket-3)",
+  below: "var(--bucket-4)",
+  "far-below": "var(--bucket-5)",
+  "no-data": "url(#hatch)",
+};
+
 // The Map tab's words for each bucket, against the national price.
 export const priceBucketLabel: Record<Bucket, string> = {
   "far-below": "Far below average",

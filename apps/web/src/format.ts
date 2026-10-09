@@ -10,6 +10,11 @@ const percent = new Intl.NumberFormat("id-ID", {
 // 16400 as "16.400".
 export const formatRupiah = (rupiah: number) => thousands.format(rupiah);
 
+const kilogramsFormat = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 });
+
+// 338 as "338". A median of two provinces can end in a half: 199.5 as "199,5".
+export const formatKilograms = (kg: number) => kilogramsFormat.format(kg);
+
 export type Change = {
   readonly direction: "up" | "down" | "flat";
   // "+Rp 550", "−Rp 2.500" or "Rp 0".
