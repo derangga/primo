@@ -382,7 +382,7 @@ Free plan budget per daily run:
 
 ## Tooling
 
-One root script, `bun run check`, is the gate. A change is done when it passes. Nothing runs it automatically: there is no git hook and no CI.
+One root script, `bun run check`, is the gate. A change is done when it passes. There is no git hook. `.github/workflows/ci.yml` runs it on every pull request and every push to `master`.
 
 | Step | Tool | Scope |
 |---|---|---|
@@ -396,6 +396,19 @@ One root script, `bun run check`, is the gate. A change is done when it passes. 
 - **Turning a rule off needs a reason.** When a rule fights a React or Effect idiom, disable it for that workspace in `oxlint.config.ts` with a one-line comment that says why. Component props are the expected first case, since `no-object-parameters` forbids them.
 - **Type checking stays on `tsc`.** The Effect language service is a TypeScript plugin, and it reports floating Effects and unsatisfied requirements that no lint rule sees.
 - **Every tool version is pinned exactly.** `oxfmt` is before 1.0 and its output can change between releases. `react-doctor` is at 0.9.
+
+### Deploying
+
+A deploy starts with a tag, created by hand in UTC: `git tag $(date -u +%Y%m%d-%H%M) && git push origin <tag>`. `.github/workflows/deploy.yml` then runs three jobs in order.
+
+1. **guard.** Fails unless the tagged commit is an ancestor of `origin/master`.
+2. **check.** Calls `ci.yml`, so the tag runs the same `bun run check` as a pull request.
+3. **deploy.** Runs `bun run deploy --yes` in the `production` GitHub Environment, which has no reviewers, then fetches `/dates` and the website and fails on an error or an empty list.
+
+- **Secrets.** `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are GitHub secrets on the `production` Environment. The token must be able to deploy Workers and D1 and attach custom domains in the `rangga.site` zone.
+- **Rollback is a forward fix.** Revert on `master`, push, then tag. D1 migrations only go forward, so each migration must work with the previous release's code. Do not retag an older commit.
+- **Pins.** Actions are pinned by full commit SHA with the version in a comment, and Bun by exact version, like every other tool here.
+- **The smoke test cannot roll back.** A failed run only means the deploy needs a fix and a new tag.
 
 ## Tests
 

@@ -1,0 +1,62 @@
+name: Deploy
+
+# Create the tag by hand in UTC: git tag $(date -u +%Y%m%d-%H%M) && git push origin <tag>
+on:
+  push:
+    tags: ["[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]"]
+
+permissions:
+  contents: read
+
+# One deploy at a time, and never cancel one halfway through a provision.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      # The full history is needed to ask whether the tagged commit is on master.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Tag must be on master
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::$GITHUB_REF_NAME is not on master. Merge the commit first, then tag it."
+            exit 1
+          fi
+
+  check:
+    needs: guard
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.2
+
+      - run: bun install --frozen-lockfile
+
+      # `bun run deploy` is `alchemy deploy --stage prod`; --yes skips the interactive prompt.
+      - name: Deploy
+        run: bun run deploy --yes
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # A deploy that finishes but serves errors must fail the run. Retries cover edge propagation.
+      - name: Smoke test
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 10 --retry-all-errors \
+            https://primo-api.rangga.site/dates | jq -e '.dates | length > 0'
+          curl --fail --silent --show-error --retry 6 --retry-delay 10 --retry-all-errors \
+            --output /dev/null https://primo.rangga.site/
