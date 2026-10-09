@@ -1,40 +1,19 @@
+import * as D1Client from "@effect/sql-d1/D1Client";
 import * as Cloudflare from "alchemy/Cloudflare";
-import { Duration, Effect, Schema } from "effect";
+import { Effect, Layer } from "effect";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
-import * as HttpClient from "effect/http/HttpClient";
 import * as HttpServerResponse from "effect/http/HttpServerResponse";
+import { ingest, windowEnding } from "./ingest.ts";
+import { Pihps } from "./pihps.ts";
+import { PriceRepo } from "./price-repo.ts";
 
-// Probe: does PIHPS answer a request made from Cloudflare's network?
-const provincesUrl = "https://www.bi.go.id/hargapangan/WebSite/TabelHarga/GetRefProvince";
+export const Prices = Cloudflare.D1.Database("Prices", {
+  name: "primo-prices",
+  migrations: "./apps/backend/migrations",
+});
 
-const ProvinceList = Schema.fromJsonString(
-  Schema.Struct({ data: Schema.Array(Schema.Struct({ id: Schema.Int, name: Schema.String })) }),
-);
-
-const probe = Effect.gen(function* () {
-  const started = Date.now();
-  const response = yield* HttpClient.get(provincesUrl).pipe(Effect.timeout(Duration.seconds(10)));
-  const body = yield* response.text;
-
-  const provinces = yield* Schema.decodeUnknownEffect(ProvinceList)(body).pipe(
-    Effect.map((list) => list.data.length),
-    Effect.orElseSucceed(() => null),
-  );
-
-  return {
-    url: provincesUrl,
-    reached: true,
-    status: response.status,
-    provinces,
-    headers: response.headers,
-    bodySnippet: provinces === null ? body.slice(0, 500) : null,
-    elapsedMs: Date.now() - started,
-  };
-}).pipe(
-  Effect.catch((error) =>
-    Effect.succeed({ url: provincesUrl, reached: false, error: String(error) }),
-  ),
-);
+// 01:00 UTC is 08:00 WIB.
+const dailyAt0800Wib = "0 1 * * *";
 
 export default Cloudflare.Worker(
   "Backend",
@@ -45,11 +24,30 @@ export default Cloudflare.Worker(
     compatibility: { date: "2026-10-01" },
     observability: { enabled: true },
   },
-  Effect.succeed({
-    fetch: probe.pipe(
-      Effect.tap((report) => Effect.log("pihps probe", report)),
-      Effect.map((report) => HttpServerResponse.jsonUnsafe(report)),
-      Effect.provide(FetchHttpClient.layer),
+  Effect.gen(function* () {
+    const prices = yield* Cloudflare.D1.QueryDatabase(yield* Prices);
+
+    const sql = Layer.unwrap(Effect.map(prices.raw, (db) => D1Client.layer({ db })));
+
+    const ingestLayer = Layer.mergeAll(Pihps.layer, PriceRepo.layer).pipe(
+      Layer.provide([FetchHttpClient.layer, sql]),
+    );
+
+    yield* Cloudflare.Workers.cron(dailyAt0800Wib, (controller) =>
+      ingest(windowEnding(new Date(controller.scheduledTime), 7)).pipe(
+        Effect.provide(ingestLayer),
+        // Alchemy swallows a failed cron handler, failures and defects alike, so they are logged here or nowhere.
+        Effect.tapCause((cause) => Effect.logError("ingest failed", cause)),
+      ),
+    );
+
+    // The prices API is mounted here by a later change.
+    return {
+      fetch: Effect.succeed(HttpServerResponse.text("primo-api", { status: 404 })),
+    };
+  }).pipe(
+    Effect.provide(
+      Layer.mergeAll(Cloudflare.Workers.CronEventSourceLive, Cloudflare.D1.QueryDatabaseBinding),
     ),
-  }),
+  ),
 );

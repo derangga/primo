@@ -57,7 +57,9 @@ apps/
       ingest.ts           ingest program (shared by Worker and script)
     test/
       pihps.test.ts       parser against a saved real response
+      price-repo.test.ts  the table, upsert and prune against real SQLite
       ingest.test.ts      ingest with swapped layers
+      support/fake-d1.ts  a D1 binding over node:sqlite in memory
       fixtures/grid-dki-7d.json
   web/
     public/provinces.json 34 province shapes, keyed by PIHPS id
@@ -146,7 +148,7 @@ A daily batch is about 5,400 rows and 170 KB of JSON.
 Pihps.fetchArea   (areaId, from, to) => Effect<Array<PriceRow>, PihpsUnreachable | PihpsMalformed>
                   R: HttpClient
 
-PriceRepo.upsert  (rows)   => Effect<void, SqlError>
+PriceRepo.upsert  (rows)   => Effect<number, SqlError>     rows D1 reports as written
 PriceRepo.prune   (before) => Effect<void, SqlError>
                   R: SqlClient
 
@@ -157,7 +159,7 @@ ingest            (window: { from, to, keepFrom }) => Effect<IngestReport, Inges
 ### Call graph, daily run
 
 ```
-shapes: AreaId, IsoDate, PriceRow, IngestReport { areasOk, areasFailed, rows }
+shapes: AreaId, IsoDate, PriceRow, IngestReport { areasOk, areasFailed, rows, rowsWritten }
 
 -> cron fires at 01:00 UTC (08:00 WIB)
   -> compute window from the scheduled time        from = today - 7d, keepFrom = today - 90d
@@ -370,7 +372,7 @@ export default Alchemy.Stack(
 ```
 
 - The backend is one Effect-native `Cloudflare.Worker`. Its constructor binds D1, builds the `PricesApi` handlers once, registers `Cloudflare.Workers.cron("0 1 * * *", ingest)` and returns `{ fetch }`.
-- The D1 database is declared with `Cloudflare.D1.Database("prices", { migrationsDir: "./apps/backend/migrations" })` and bound only to the backend.
+- The D1 database is declared with `Cloudflare.D1.Database("Prices", { name: "primo-prices", migrations: "./apps/backend/migrations" })` and bound only to the backend.
 - `vite.config.ts` has `tanstackStart()`, `viteReact()` and the Tailwind plugin. Alchemy's docs say `@cloudflare/vite-plugin` conflicts with it.
 - **Domains.** The website is `primo.rangga.site` and the backend is `primo-api.rangga.site`, both attached as Worker custom domains (`domain` on the resource) in the `rangga.site` zone of the same account. `VITE_API_URL` is `https://primo-api.rangga.site`.
 - **Names.** Every resource has an explicit `name` (the backend Worker is `primo-api`), and the stage is pinned to `prod` in the package scripts. Alchemy's default stage is `live_${USER}`, which would put the machine's user name into resource names and state.
@@ -380,10 +382,10 @@ Free plan budget per daily run:
 
 | Limit | Allowed | Used |
 |---|---|---|
-| Subrequests | 50 | 37 (35 fetches, 1 upsert, 1 prune) |
+| Subrequests | 50 | 35 measured on 2026-10-09 (the 35 fetches; Cloudflare's analytics do not count the 2 D1 binding queries) |
 | D1 rows written per day | 100,000 | about 6,500 (5,400 upserts at most, 1,085 pruned) |
 | Cron triggers | 5 | 1 |
-| CPU | 10 ms | unmeasured |
+| CPU | 10 ms | 304 ms on 2026-10-09, over the limit; see the CPU row under Still to verify |
 
 ## Tooling
 
@@ -413,8 +415,8 @@ ingest test: same graph, R swapped
 
 -> ingest(window)
   -> Pihps.fetchArea        R: test layer, returns the fixture for some areas and PihpsUnreachable for others
-  -> PriceRepo.upsert       R: in-memory layer that records the rows
-  -> PriceRepo.prune        R: same in-memory layer
+  -> PriceRepo.upsert       R: D1Client over a D1 binding backed by node:sqlite in memory
+  -> PriceRepo.prune        R: same binding, which records each query and can fail chosen statements
 ```
 
 Three small tests:
@@ -446,13 +448,13 @@ These are assumptions the design rests on. Each has a fallback.
 | Assumption | Checked at step | Fallback | Result |
 |---|---|---|---|
 | BI answers Cloudflare IPs | 1 | Run ingestion locally on a schedule with the backfill script's layers | Answered, 2026-10-08. A deployed Worker fetched `GetRefProvince` six times: HTTP 200 and 34 provinces every time, 109 to 440 ms, leaving from the SIN and HKG colos. No block headers. |
-| A daily run fits in 10 ms CPU | 5 | Split the 35 areas across up to 5 cron triggers |  |
-| `@effect/sql-d1` can take the D1 binding inside Alchemy's Effect-native Worker | 3 | Back `PriceRepo` with Alchemy's own `Cloudflare.D1.QueryDatabase` client |  |
+| A daily run fits in 10 ms CPU | 5 | Split the 35 areas across up to 5 cron triggers | Failed, 2026-10-09. The 01:00 UTC run used 304 ms CPU and 6.1 s wall time, and Cloudflare still reported it as a success. Locally, decoding and pivoting the 35 responses costs about 63 ms on a cold start and 20 ms warm, so the PIHPS decode is most of it. Five triggers would still need about 60 ms each, so the fallback does not fit either. Undecided. |
+| `@effect/sql-d1` can take the D1 binding inside Alchemy's Effect-native Worker | 3 | Back `PriceRepo` with Alchemy's own `Cloudflare.D1.QueryDatabase` client | Confirmed, 2026-10-09. The cron upserted through `D1Client` over the binding: 2026-10-09 rows appeared and the prune moved the oldest date to 2026-07-13. |
 | One Effect-native Worker can serve an `HttpApi` and register a cron | 5 | Split the cron into a second Worker bound to the same D1 |  |
 | An API request (decode, one query, encode) fits in 10 ms CPU | 5 | Drop response encoding to plain JSON for the series endpoint |  |
 | TanStack Charts 1.0 can draw 34 provinces with hover and selection | 7 | Draw the map as plain SVG with d3-geo and keep TanStack Charts for the charts |  |
-| A 170 KB string fits one D1 bound parameter | 3 | Split the batch into 5 upserts of 7 areas each, about 34 KB per query, for 41 subrequests in total |  |
-| The conditional `DO UPDATE ... WHERE` avoids counting unchanged rows as writes | 5 | None needed, the budget holds either way |  |
+| A 170 KB string fits one D1 bound parameter | 3 | Split the batch into 5 upserts of 7 areas each, about 34 KB per query, for 41 subrequests in total | Confirmed through the REST API, 2026-10-08. The stored 2026-10-01 to 10-08 rows (6,354 rows, a 205,060-byte JSON string) went through the upsert as one bound parameter in 20 ms. The binding path held on 2026-10-09: the cron's one upsert carried about 6,500 rows. |
+| The conditional `DO UPDATE ... WHERE` avoids counting unchanged rows as writes | 5 | None needed, the budget holds either way | Confirmed, 2026-10-08. D1 reported `rows_written` 0 for an unchanged single row, for the 205 KB batch above, and for a second full backfill of 68,957 rows. A rerun costs reads only. |
 | Prerendering works under `Cloudflare.Website.Vite` | 6 | Let the website Worker render the shell per request, and measure it against 10 ms CPU |  |
 | GeoJSON source licence allows redistribution | 7 | Use the other candidate source from `.FINDINGS.md` | Yes, 2026-10-08. geoBoundaries gbOpen IDN ADM1 is ODbL 1.0 (OpenStreetMap), which allows redistribution with "© OpenStreetMap contributors" shown and the derived file kept under ODbL. It has the 34 pre-2022 provinces. Details in `apps/web/public/provinces.source.md`. |
 | UMP 2026 for all 34 provinces from a Kemnaker source | 2 | None, this must be found before the Purchasing Power tab | Found, 2026-10-08, but not from Kemnaker directly: its list exists only as an Instagram post. All 34 figures agree across at least two independent outlets (Detik, IDX Channel, Metro TV), and DKI Jakarta and Jawa Barat match. Sumatera Utara's decree (3,228,971) and Kemnaker's list (3,228,949) differ by Rp 22; the user chose the decree. Sources are in `reference.ts`. |

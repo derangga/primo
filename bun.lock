@@ -23,11 +23,13 @@
     "apps/backend": {
       "name": "@primo/backend",
       "dependencies": {
+        "@effect/sql-d1": "4.0.2",
         "@primo/contract": "workspace:*",
         "alchemy": "2.0.0-beta.81",
         "effect": "4.0.2",
       },
       "devDependencies": {
+        "@effect/platform-bun": "4.0.2",
         "@types/node": "22.20.5",
       },
     },

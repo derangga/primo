@@ -22,6 +22,8 @@ export default defineConfig({
     { name: "anti-slop-effect", specifier: "./tools/oxlint/anti-slop/effect/index.ts" },
   ],
   rules: {
+    // Every if, else and loop body in braces, even one line: easier to read and to extend.
+    curly: ["error", "all"],
     "oxc/no-accumulating-spread": "error",
     "anti-slop/no-array-filter-map": "error",
     "anti-slop/no-reduce-accumulator-copy": "error",

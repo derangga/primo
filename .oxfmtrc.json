@@ -8,6 +8,7 @@
     "docs/**",
     "*.md",
     "tools/oxlint/anti-slop/**",
-    "apps/web/public/provinces.json"
+    "apps/web/public/provinces.json",
+    "apps/backend/test/fixtures/**"
   ]
 }

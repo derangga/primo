@@ -15,7 +15,8 @@
     "doctor": "react-doctor apps/web --blocking error --no-telemetry --no-supply-chain",
     "deploy": "alchemy deploy --stage prod",
     "destroy": "alchemy destroy --stage prod",
-    "logs": "alchemy logs --stage prod"
+    "logs": "alchemy logs --stage prod",
+    "backfill": "bun apps/backend/scripts/backfill.ts"
   },
   "devDependencies": {
     "@effect/language-service": "0.87.4",
