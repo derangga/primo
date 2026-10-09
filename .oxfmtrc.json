@@ -9,6 +9,7 @@
     "*.md",
     "tools/oxlint/anti-slop/**",
     "apps/web/public/provinces.json",
-    "apps/backend/test/fixtures/**"
+    "apps/backend/test/fixtures/**",
+    "apps/web/src/routeTree.gen.ts"
   ]
 }

@@ -2,3 +2,4 @@ node_modules/
 .alchemy/
 *.tsbuildinfo
 .env
+dist/

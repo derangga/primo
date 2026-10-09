@@ -36,3 +36,8 @@ export type IsoDate = typeof IsoDate.Type;
 export const Rupiah = Schema.Int.pipe(Schema.brand("Rupiah"));
 
 export type Rupiah = typeof Rupiah.Type;
+
+// Every date that has prices, oldest first.
+export const DatesResponse = Schema.Struct({ dates: Schema.Array(IsoDate) });
+
+export type DatesResponse = typeof DatesResponse.Type;

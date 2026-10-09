@@ -90,6 +90,25 @@ describe("PriceRepo", () => {
     }).pipe(Effect.provide(layer));
   });
 
+  it.effect("dates lists the days that have prices, oldest first", () => {
+    const { layer } = withRepo();
+
+    return Effect.gen(function* () {
+      const repo = yield* PriceRepo;
+
+      assert.deepStrictEqual(yield* repo.dates(), []);
+
+      yield* repo.upsert([
+        { ...row("2026-10-07", 1), areaId: AreaId.make(0) },
+        { ...row("2026-10-05", 1), areaId: AreaId.make(0) },
+        { ...row("2026-10-08", 1), areaId: AreaId.make(0), commodityId: "com_3" },
+        { ...row("2026-10-09", 1), areaId: AreaId.make(13) },
+      ]);
+
+      assert.deepStrictEqual(yield* repo.dates(), ["2026-10-05", "2026-10-07"]);
+    }).pipe(Effect.provide(layer));
+  });
+
   it.effect("the backfill's layer writes one statement per area", () => {
     const { sqlite, queries, layer } = makeFakeD1();
 

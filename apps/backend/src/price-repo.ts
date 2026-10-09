@@ -1,4 +1,4 @@
-import type { IsoDate } from "@primo/contract/schemas";
+import { IsoDate } from "@primo/contract/schemas";
 import { Context, Effect, Layer, Schedule, Schema } from "effect";
 import { SqlClient } from "effect/sql/SqlClient";
 import type { PriceRow } from "./pihps.ts";
@@ -7,6 +7,8 @@ import type { PriceRow } from "./pihps.ts";
 const decodeWriteResult = Schema.decodeUnknownEffect(
   Schema.Struct({ meta: Schema.Struct({ rows_written: Schema.Number }) }),
 );
+
+const decodeDates = Schema.decodeUnknownEffect(Schema.Array(Schema.Struct({ date: IsoDate })));
 
 export class PriceRepo extends Context.Service<PriceRepo>()("PriceRepo", {
   make: Effect.gen(function* () {
@@ -42,7 +44,23 @@ export class PriceRepo extends Context.Service<PriceRepo>()("PriceRepo", {
       yield* sql`DELETE FROM prices WHERE date < ${before}`;
     });
 
-    return { upsert, prune };
+    // Every date that has prices, oldest first. Beras at the national level (cat_1, area 0) stands for the
+    // whole run, and the WHERE keeps the read to the primary key's range: a bare max(date) would scan every row.
+    const dates = Effect.fn("PriceRepo.dates")(
+      function* () {
+        const rows = yield* sql`
+          SELECT date FROM prices WHERE commodity_id = 'cat_1' AND area_id = 0 ORDER BY date
+        `;
+
+        const decoded = yield* decodeDates(rows);
+
+        return decoded.map((row) => row.date);
+      },
+      // Dates in the table were written through IsoDate, so another shape is a bug here, not a D1 failure.
+      (effect) => effect.pipe(Effect.catchTag("SchemaError", (error) => Effect.die(error))),
+    );
+
+    return { upsert, prune, dates };
   }),
 }) {
   static readonly layer = Layer.effect(this, this.make);

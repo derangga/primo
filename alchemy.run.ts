@@ -9,6 +9,16 @@ export default Alchemy.Stack(
   Effect.gen(function* () {
     const backend = yield* Backend;
 
-    return { apiUrl: backend.url };
+    const website = yield* Cloudflare.Website.Vite("Website", {
+      name: "primo",
+      domain: "primo.rangga.site",
+      rootDir: "apps/web",
+      // Inlined into the website bundle at build time as import.meta.env.VITE_API_URL.
+      env: { VITE_API_URL: backend.url.as<string>() },
+      // The router's URLs have no trailing slash, so /chart must be served without a redirect to /chart/.
+      assets: { htmlHandling: "drop-trailing-slash" },
+    });
+
+    return { apiUrl: backend.url, websiteUrl: website.url };
   }),
 );

@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "./tokens.css";
+
+/* Registers the design tokens as Tailwind utilities (bg-card, text-text-2, rounded-lg).
+   "inline" makes each utility read the token itself, so tokens.css stays the only definition
+   and the dark values still switch on [data-theme="dark"]. */
+@theme inline {
+  --color-page: var(--color-page);
+  --color-card: var(--color-card);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-text: var(--color-text);
+  --color-text-2: var(--color-text-2);
+  --color-text-disabled: var(--color-text-disabled);
+  --color-hover: var(--color-hover);
+  --color-accent: var(--color-accent);
+  --color-on-accent: var(--color-on-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-warn: var(--color-warn);
+  --color-warn-bg: var(--color-warn-bg);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-skeleton: var(--skeleton);
+  --color-scrim: var(--color-scrim);
+
+  --font-sans: var(--font-sans);
+
+  --text-xs: var(--text-xs);
+  --text-xs--line-height: var(--leading);
+  --text-sm: var(--text-sm);
+  --text-sm--line-height: var(--leading);
+  --text-md: var(--text-md);
+  --text-md--line-height: var(--leading);
+  --text-lg: var(--text-lg);
+  --text-lg--line-height: var(--leading);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-pop: var(--shadow-pop);
+
+  --breakpoint-sm: 640px;
+  --breakpoint-lg: 1024px;
+}
+
+/* Hover styles apply only where a fine pointer can hover, as DESIGN.UI.md maps .is-hover. */
+@custom-variant fine-hover (@media (hover: hover) and (pointer: fine));
+
+@theme {
+  --animate-pop-in: pop-in var(--dur-pop) var(--ease-out);
+  --animate-pop-out: pop-out 100ms var(--ease-out) forwards;
+}
+
+@layer base {
+  html {
+    background: var(--color-page);
+  }
+
+  /* The size is on body, not html, so rem keeps its 16 px and Tailwind's spacing stays on the 4 px grid. */
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    line-height: var(--leading);
+    color: var(--color-text);
+    /* Figures swap in place when the date steps, so digits must not shift. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+}
+
+/* Popovers fade in and scale from 0.97. Closing takes 100 ms. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+/* Reduced motion keeps the fades and drops the scale. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pop-out {
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+/* Skeleton pulse: opacity between 1 and 0.55 over 1.2 s, still with reduced motion. */
+@keyframes sk-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-sk {
+    animation: sk-pulse 1.2s ease-in-out infinite;
+  }
+}

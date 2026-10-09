@@ -1,8 +1,9 @@
 import * as D1Client from "@effect/sql-d1/D1Client";
+import { RuntimeContext } from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
-import { Effect, Layer } from "effect";
-import * as FetchHttpClient from "effect/http/FetchHttpClient";
-import * as HttpServerResponse from "effect/http/HttpServerResponse";
+import { Effect, Layer, Scope } from "effect";
+import { FetchHttpClient, HttpRouter } from "effect/http";
+import { ApiRoutes } from "./handlers.ts";
 import { ingest, windowEnding } from "./ingest.ts";
 import { Pihps } from "./pihps.ts";
 import { PriceRepo } from "./price-repo.ts";
@@ -41,10 +42,26 @@ export default Cloudflare.Worker(
       ),
     );
 
-    // The prices API is mounted here by a later change.
-    return {
-      fetch: Effect.succeed(HttpServerResponse.text("primo-api", { status: 404 })),
-    };
+    const api = ApiRoutes.pipe(
+      Layer.provide(PriceRepo.layer),
+      Layer.provide(sql),
+      // The D1 client fails to build only when its own config is wrong, which is a bug here.
+      Layer.orDie,
+    );
+
+    // The router is built on the first request, because the D1 binding is only readable then, and kept
+    // for the life of the isolate. RuntimeContext.phantom only satisfies the type: it is the same
+    // phantom Alchemy's own Workers use for binding access inside a handler.
+    const isolate = yield* Scope.make();
+
+    const router = yield* Effect.cached(
+      HttpRouter.toHttpEffect(api).pipe(
+        Effect.provideService(Scope.Scope, isolate),
+        Effect.provide(RuntimeContext.phantom),
+      ),
+    );
+
+    return { fetch: Effect.succeed(Effect.flatten(router)) };
   }).pipe(
     Effect.provide(
       Layer.mergeAll(Cloudflare.Workers.CronEventSourceLive, Cloudflare.D1.QueryDatabaseBinding),
