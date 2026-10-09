@@ -11,7 +11,11 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Food Price Monitor" },
     ],
-    links: [{ rel: "stylesheet", href: styles }],
+    links: [
+      { rel: "stylesheet", href: styles },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+    ],
     scripts: [{ children: themeScript }],
   }),
   component: RootLayout,
