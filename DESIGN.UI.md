@@ -127,6 +127,11 @@ One trigger and one option list serve all three.
 
 The Map tab has the province picker because DKI Jakarta is a few pixels wide on the map and the map cannot be reached by keyboard. Selecting in the picker and clicking the map set the same `area` search param.
 
+Changing any filter rewrites a search param without changing the page, so none of them move the
+viewport (`resetScroll: false` on every `navigate`). Switching tabs is a real page change and still
+goes to the top. Below 640 px the map fills the screen once scrolled to, and the default would have
+thrown it off screen on every province picked.
+
 ### Date control (`.datectl`)
 
 Previous button, date trigger, next button, "Latest" button.
@@ -226,9 +231,9 @@ Blocks in `--skeleton` with a 4 px radius, sized and placed like the content the
 
 The map is SVG drawn by `geoShape` from `@tanstack/charts/geo`, one `<path>` per province. Every paint below is a CSS custom property written as `var(--token)`. `.map` in `components.css` holds the same values as CSS rules.
 
-- **Shapes.** One `geoShape` over the 34 features of `provinces.json`, keyed by PIHPS province id. Its projection fits the features to the card at about 5:2. No pan or zoom. No basemap.
+- **Shapes.** One `geoShape` over the 34 features of `provinces.json`, keyed by PIHPS province id. Its projection fits the features to the card at about 5:2. No basemap.
 - **Fill.** The app computes each province's bucket, and the `fill` channel returns that bucket's token, for example `var(--bucket-3)`. Hover and selection never change the fill.
-- **Border.** `stroke: var(--color-border-strong)`, `stroke-width: 0.75`, `stroke-linejoin: round`. Strokes do not scale with the map (`vector-effect: non-scaling-stroke`).
+- **Border.** `stroke: var(--color-border-strong)`, `stroke-width: 0.75`, `stroke-linejoin: round`. Strokes do not scale with the map (`vector-effect: non-scaling-stroke`), and zoom does not scale them either (see Zoom and pan).
 - **Hover.** A focus state on the same mark (`when: { focus: 'primary' }`) sets `stroke: var(--color-text)` and `stroke-width: 1.5`. Hover shows no label.
 - **Selected.** One province at a time, held in the `area` search param and passed to the chart as a controlled keyed selection. Two rings and a label, each a mark that paints only the selected province (`whenSelected`). All three are drawn after the province layer, in this order:
   1. Under-ring: `fill: none`, `stroke: var(--color-card)`, `stroke-width: 5`.
@@ -238,6 +243,41 @@ The map is SVG drawn by `geoShape` from `@tanstack/charts/geo`, one `<path>` per
 - **No data.** `fill: url(#hatch)`, `stroke-dasharray: 3 2`, with the normal border colour and width. `#hatch` is an SVG `<pattern>`, 5 × 5 user units, rotated 45°: a `--bucket-nodata` square under one 1.5-wide line in `--bucket-hatch`. If the hatch cannot be applied, the dashed border alone still separates the province.
 - **Loading.** The shapes ship with the page, so draw the map at once with every province in `fill: var(--skeleton)`, `stroke: var(--color-card)`, `stroke-width: 1`, and no hover, selection or tooltip.
 - **Tooltip.** Anchored to the pointer at a 12 px offset, flipping placement at the card edge. The body is the `.tip` HTML rendered by React (`renderTooltipBody`). The library's own tooltip surface is restyled through its `className` to be transparent with no border, padding or shadow, so only `.tip` shows.
+
+### Zoom and pan
+
+The map goes from its fitted view to 8x, which brings DKI Jakarta up to about the width Jawa Timur
+has unzoomed. It can never go below the fitted view, and it can never be dragged so that the card
+shows anything beside the map.
+
+Zoom is a CSS transform on a wrapper around the chart, not a new projection. Refitting the 34
+features costs about 13 ms a frame on a desktop, so no gesture could carry it. The chart resolves a
+pointer through the SVG's `getScreenCTM`, which carries that transform, so hover, selection and the
+tooltip go on hitting the province under the cursor.
+
+- **Controls.** One segmented control in the bottom right corner of the map: `--control-h` icon
+  buttons sharing a `--radius-md` border and one `--shadow-pop`, separated by 1 px of
+  `--color-border`. Each press is a factor of 1.6, so four presses reach 8x. The map is not a
+  keyboard stop, so these buttons are the whole keyboard and screen reader route into zoom.
+  At the fitted view only zoom in can do anything, so it is the only button shown: a phone's map is
+  about 130 px tall and three buttons cover a third of it. Reset and zoom out appear to its left
+  once the map is zoomed in, in the order reset, zoom out, zoom in. Zoom in is at the right end and
+  never moves, so pressing it again never lands on a button that has just appeared under the
+  finger.
+- **Wheel.** A plain wheel scrolls the page. Ctrl or Cmd held zooms about the pointer, which is also
+  what a trackpad pinch sends.
+- **Touch.** One finger scrolls the page while the map is at its fitted view, and pans the map once
+  it is zoomed in (`touch-action` moves from `pan-y` to `none`). Two fingers always belong to the
+  map: pinch zooms, drag pans.
+- **Click.** A click still picks a province. A drag does not, and a double click does nothing.
+- **What does not scale.** Everything the map draws at a fixed pixel size divides the zoom back out,
+  so it holds that size on screen at any zoom: both selection rings, the province border and its
+  hover width, and the selected province's label and halo. The shapes are what grows. The tooltip
+  leaves the transform entirely, through the chart's `portal` tooltip option, which opens it in the
+  browser's top layer.
+- **Sharpness.** The wrapper must not carry `will-change: transform`. It promotes the map to a layer
+  rasterised once at the fitted size, and the GPU then stretches that bitmap instead of redrawing
+  the outlines.
 
 ## Chart styling (TanStack Charts)
 

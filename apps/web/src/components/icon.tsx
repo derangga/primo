@@ -16,6 +16,9 @@ const paths = {
   left: "M8.5 3l-4 4 4 4",
   right: "M5.5 3l4 4-4 4",
   x: "M3.5 3.5l7 7M10.5 3.5l-7 7",
+  plus: "M7 2.5v9M2.5 7h9",
+  minus: "M2.5 7h9",
+  fit: "M2 5V2.5h3M12 5V2.5H9M2 9v2.5h3M12 9v2.5H9",
 };
 
 export type IconName = keyof typeof paths;

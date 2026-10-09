@@ -6,9 +6,12 @@ import { Chart } from "@tanstack/charts/react/tooltip";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { keyedSelection, whenSelected } from "@tanstack/charts/selection";
 import { tooltip } from "@tanstack/charts/tooltip";
+import { portal } from "@tanstack/charts/tooltip/portal";
 import { geoMercator, geoPath } from "d3-geo";
 import { useMemo, type ReactNode } from "react";
 import { provinceName } from "~/areas";
+import { MapZoomControls } from "~/components/map-zoom-controls";
+import { useMapZoom } from "~/components/map-zoom";
 import type { ProvinceFeature } from "~/provinces";
 
 // The map card is about 5:2 (DESIGN.UI.md, Map styling).
@@ -108,7 +111,7 @@ export function ProvinceMap(props: {
         whenSelected(
           Geo.geoShape(features, {
             key: (feature) => feature.properties.id,
-            className: "province",
+            className: "province-ring province-ring-under",
             projection,
             fill: "none",
             stroke: "var(--color-card)",
@@ -119,7 +122,7 @@ export function ProvinceMap(props: {
         whenSelected(
           Geo.geoShape(features, {
             key: (feature) => feature.properties.id,
-            className: "province",
+            className: "province-ring province-ring-over",
             projection,
             fill: "none",
             stroke: "var(--color-text)",
@@ -151,6 +154,10 @@ export function ProvinceMap(props: {
       selection,
       tooltip: {
         use: tooltip,
+        // The tooltip would otherwise sit inside the zoomed wrapper and be magnified with the map.
+        // The portal opens it in the browser's top layer, which no ancestor transform reaches, and
+        // that also frees it from the viewport's overflow clip.
+        portal,
         anchor: "pointer",
         placement: ["right", "left", "bottom", "top"],
         offset: 12,
@@ -160,19 +167,32 @@ export function ProvinceMap(props: {
     });
   }, [features, labels, fill, selected, onSelect]);
 
-  return (
-    <div className="province-map">
-      <Chart
-        definition={definition}
-        aspectRatio={aspectRatio}
-        initialWidth={1000}
-        ariaLabel={ariaLabel}
-        renderTooltipBody={({ points }) => {
-          const id = points[0]?.datum.properties.id;
+  const { viewportRef, contentRef, zoomed, zoomIn, zoomOut, reset } = useMapZoom();
 
-          return interaction === null || id === undefined ? null : interaction.tip(id);
-        }}
-      />
+  return (
+    <div className="province-map relative">
+      {/* The clip the zoomed map is seen through. One finger scrolls the page until the map is
+          zoomed in, at which point it pans instead; two fingers always belong to the map. */}
+      <div
+        ref={viewportRef}
+        className="relative overflow-hidden"
+        style={{ touchAction: zoomed ? "none" : "pan-y" }}
+      >
+        <div ref={contentRef} className="province-map-content">
+          <Chart
+            definition={definition}
+            aspectRatio={aspectRatio}
+            initialWidth={1000}
+            ariaLabel={ariaLabel}
+            renderTooltipBody={({ points }) => {
+              const id = points[0]?.datum.properties.id;
+
+              return interaction === null || id === undefined ? null : interaction.tip(id);
+            }}
+          />
+        </div>
+      </div>
+      <MapZoomControls zoomed={zoomed} onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={reset} />
     </div>
   );
 }

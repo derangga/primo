@@ -26,20 +26,26 @@ export const Route = createFileRoute("/")({
 
 // The commodity, date and selected province are in the URL, and an absent or invalid one means
 // Beras, the newest date and no province.
+// Every navigate below only rewrites a search param, so the page under it does not change:
+// `resetScroll: false` says so. The default throws the viewport back to the top, which on a phone
+// means picking a province scrolls the map itself off the screen.
 function MapRoute() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const dates = useQuery(datesOptions).data?.dates;
   const commodity = search.commodity ?? defaultCommodity;
 
-  const setArea = (area: AreaId | undefined) => navigate({ search: (prev) => ({ ...prev, area }) });
+  const setArea = (area: AreaId | undefined) =>
+    navigate({ search: (prev) => ({ ...prev, area }), resetScroll: false });
 
   return (
     <>
       <h1 className="sr-only">Map</h1>
       <FilterBar
         commodity={commodity}
-        onCommodity={(next) => navigate({ search: (prev) => ({ ...prev, commodity: next }) })}
+        onCommodity={(next) =>
+          navigate({ search: (prev) => ({ ...prev, commodity: next }), resetScroll: false })
+        }
       >
         <Field label="Province">
           <Picker
@@ -54,7 +60,9 @@ function MapRoute() {
         <DateControl
           dates={dates}
           date={dates === undefined ? undefined : resolveDate(dates, search.date)}
-          onChange={(next) => navigate({ search: (prev) => ({ ...prev, date: next }) })}
+          onChange={(next) =>
+            navigate({ search: (prev) => ({ ...prev, date: next }), resetScroll: false })
+          }
         />
       </FilterBar>
       <MapView

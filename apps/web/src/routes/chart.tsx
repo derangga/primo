@@ -24,6 +24,9 @@ export const Route = createFileRoute("/chart")({
 });
 
 // Commodity, area and range are in the URL, and an absent or invalid one means Beras, National and 1 month.
+// Every navigate below only rewrites a search param, so the page under it does not change:
+// `resetScroll: false` says so. The default throws the viewport back to the top, which on a phone
+// means picking a province scrolls the map itself off the screen.
 function ChartRoute() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -36,7 +39,9 @@ function ChartRoute() {
       <h1 className="sr-only">Chart</h1>
       <FilterBar
         commodity={commodity}
-        onCommodity={(next) => navigate({ search: (prev) => ({ ...prev, commodity: next }) })}
+        onCommodity={(next) =>
+          navigate({ search: (prev) => ({ ...prev, commodity: next }), resetScroll: false })
+        }
       >
         <Field label="Area">
           <Picker
@@ -46,13 +51,18 @@ function ChartRoute() {
             valueLabel={areaName(area)}
             className="sm:w-60"
             onChange={(next) =>
-              navigate({ search: (prev) => ({ ...prev, area: AreaId.make(Number(next)) }) })
+              navigate({
+                search: (prev) => ({ ...prev, area: AreaId.make(Number(next)) }),
+                resetScroll: false,
+              })
             }
           />
         </Field>
         <RangeControl
           value={range}
-          onChange={(next) => navigate({ search: (prev) => ({ ...prev, range: next }) })}
+          onChange={(next) =>
+            navigate({ search: (prev) => ({ ...prev, range: next }), resetScroll: false })
+          }
         />
       </FilterBar>
       <ChartView commodity={commodity} area={area} range={range} />
