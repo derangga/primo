@@ -126,18 +126,13 @@ export function OptionList<V extends string>(props: {
     >
       {entries.map((entry, index) => {
         switch (entry.kind) {
-          case "heading":
-            return (
-              <div
-                key={`heading-${entry.label}`}
-                className="px-2.5 pt-2.5 pb-1 text-xs font-medium tracking-[0.06em] text-text-2 uppercase"
-              >
-                {entry.label}
-              </div>
-            );
-
           case "divider":
-            return <hr key={`divider-${index}`} className="mx-2.5 my-1 h-px border-0 bg-border" />;
+            return (
+              <hr
+                key={`divider-${index}`}
+                className="mx-2.5 my-1 h-px border-0 bg-border max-sm:mx-0"
+              />
+            );
 
           case "option": {
             const position = options.findIndex((option) => option.index === index);
@@ -156,7 +151,7 @@ export function OptionList<V extends string>(props: {
                   }
                 }}
                 className={cn(
-                  "flex min-h-8 cursor-default items-center justify-between gap-3 rounded-[6px] px-2.5 whitespace-nowrap select-none",
+                  "flex min-h-8 max-sm:min-h-11 max-sm:pr-3 cursor-default items-center justify-between gap-3 rounded-[6px] px-2.5 whitespace-nowrap select-none",
                   entry.indent === true && "pl-[26px]",
                   entry.emphasis === true && "font-medium",
                   position === activeAt && "bg-hover",

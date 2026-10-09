@@ -1,8 +1,6 @@
-// One row of a picker's list. The commodity list is categories with their variants indented,
-// the area list is "National" or "All provinces", a divider and the provinces, the date list is
-// dates under month headings.
+// One row of a picker's list. The commodity list is categories with their variants indented, the
+// area list is "National" or "All provinces", a divider and the provinces.
 export type PickerEntry<V extends string> =
-  | { readonly kind: "heading"; readonly label: string }
   | { readonly kind: "divider" }
   | {
       readonly kind: "option";

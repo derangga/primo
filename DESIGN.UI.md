@@ -121,9 +121,9 @@ One trigger and one option list serve all three.
 - **Trigger.** An overline label above a 40 px button showing the current value and a chevron. Widths: commodity 280 px, area 240 px, date 176 px. The longest names ("Minyak Goreng Kemasan Bermerk 1", "Kepulauan Bangka Belitung") fit without truncation. It is disabled with a skeleton bar while its options load.
 - **Commodity list.** 31 options. The 10 categories are selectable and set at weight 500. Their variants sit indented beneath them (`.opt.is-sub`).
 - **Area list.** On the Chart tab: "National", a divider, then 34 provinces in alphabetical order. On the Map tab the same picker is labelled "Province" and its first option is "All provinces", which clears the selection.
-- **Date list, from 640 px.** One option per date that has data, newest first, under month headings.
-- **From 640 px** the list opens as a popover under the trigger, at most 360 px tall. Typing jumps to a match.
-- **Below 640 px** the list opens in a bottom sheet.
+- **Date.** A month calendar, not a list: the shadcn Calendar over react-day-picker. See "Calendar". Changed 2026-10-09, the list under month headings was hard to scan across 90 days and wrong on a phone.
+- **From 640 px** a list opens as a popover under the trigger, at most 360 px tall. Typing jumps to a match. The date calendar opens in the same kind of popover.
+- **Below 640 px** every picker opens in a bottom sheet.
 
 The Map tab has the province picker because DKI Jakarta is a few pixels wide on the map and the map cannot be reached by keyboard. Selecting in the picker and clicking the map set the same `area` search param.
 
@@ -146,7 +146,7 @@ Below 640 px only. One sheet per field: commodity, province or area, date.
 
 ### Calendar (`.cal`, `.cal-day`)
 
-The date bottom sheet holds a month calendar in place of a list.
+The date picker is a month calendar: in a popover under the trigger from 640 px, in the date bottom sheet below that. Day cells are 44 px on a phone and 40 px from 640 px. The calendar opens on the selected day's month with focus on the selected day.
 
 - Previous and next month buttons either side of the month name, a Su to Sa weekday row, seven columns, 44 px day cells.
 - Only days that have data are enabled. Weekends, missing days, future days and days outside the 90-day window are in the disabled colour and cannot be tapped.

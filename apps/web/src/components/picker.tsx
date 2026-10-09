@@ -1,7 +1,7 @@
-import { useId, useState, type ReactNode } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import { Icon } from "~/components/icon";
 import { OptionList } from "~/components/option-list";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { PickerOverlay } from "~/components/picker-overlay";
 import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
 import type { PickerEntry } from "~/picker-entries";
@@ -18,9 +18,41 @@ export function Field(props: { readonly label: string; readonly children: ReactN
   );
 }
 
-// The one trigger and option list behind the commodity, province, area and date pickers (.ctl,
-// .pop, .opt). `className` sets the trigger's width. While its options load it is disabled with a
-// skeleton bar in place of the value.
+// The trigger of every picker (.ctl): the current value and a chevron. `className` sets its width.
+// While the options load it is disabled with a skeleton bar in place of the value. Radix passes
+// its trigger props through, so the date picker's sheet and popover use it too.
+export function PickerTrigger(
+  props: ComponentProps<"button"> & {
+    readonly label: string;
+    readonly valueLabel: string;
+    readonly loading: boolean;
+  },
+) {
+  const { label, valueLabel, loading, className, ...rest } = props;
+
+  return (
+    <button
+      type="button"
+      disabled={loading}
+      aria-label={loading ? label : `${label}: ${valueLabel}`}
+      className={cn(
+        "flex h-(--control-h) w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left whitespace-nowrap fine-hover:hover:border-border-strong aria-expanded:border-accent disabled:bg-page disabled:text-text-disabled",
+        className,
+      )}
+      {...rest}
+    >
+      {loading ? (
+        <Skeleton className="h-2.5 w-24" />
+      ) : (
+        <span className="truncate">{valueLabel}</span>
+      )}
+      <Icon name="down" />
+    </button>
+  );
+}
+
+// The commodity, province and area pickers: the trigger above and an option list (.pop, .opt),
+// in a popover or on a phone a bottom sheet.
 export function Picker<V extends string>(props: {
   readonly label: string;
   readonly entries: ReadonlyArray<PickerEntry<V>>;
@@ -32,42 +64,32 @@ export function Picker<V extends string>(props: {
 }) {
   const { label, entries, value, valueLabel, onChange, loading = false, className } = props;
   const [open, setOpen] = useState(false);
-  const labelId = useId();
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          disabled={loading}
-          aria-haspopup="listbox"
-          aria-label={loading ? label : `${label}: ${valueLabel}`}
-          id={labelId}
-          className={cn(
-            "flex h-(--control-h) w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left whitespace-nowrap fine-hover:hover:border-border-strong aria-expanded:border-accent disabled:bg-page disabled:text-text-disabled",
-            className,
-          )}
-        >
-          {loading ? (
-            <Skeleton className="h-2.5 w-24" />
-          ) : (
-            <span className="truncate">{valueLabel}</span>
-          )}
-          <Icon name="down" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent onOpenAutoFocus={(event) => event.preventDefault()}>
-        <OptionList
-          entries={entries}
-          value={value}
+    <PickerOverlay
+      title={label}
+      open={open}
+      onOpenChange={setOpen}
+      trigger={
+        <PickerTrigger
           label={label}
-          className="max-h-[360px]"
-          onSelect={(next) => {
-            setOpen(false);
-            onChange(next);
-          }}
+          valueLabel={valueLabel}
+          loading={loading}
+          aria-haspopup="listbox"
+          className={className}
         />
-      </PopoverContent>
-    </Popover>
+      }
+    >
+      <OptionList
+        entries={entries}
+        value={value}
+        label={label}
+        className="max-h-[360px] max-sm:max-h-none max-sm:px-2 max-sm:pt-1 max-sm:pb-4"
+        onSelect={(next) => {
+          setOpen(false);
+          onChange(next);
+        }}
+      />
+    </PickerOverlay>
   );
 }

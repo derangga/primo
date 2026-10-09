@@ -54,6 +54,10 @@
 @theme {
   --animate-pop-in: pop-in var(--dur-pop) var(--ease-out);
   --animate-pop-out: pop-out 100ms var(--ease-out) forwards;
+  --animate-sheet-in: sheet-in var(--dur-sheet) var(--ease-sheet);
+  --animate-sheet-out: sheet-out 200ms var(--ease-sheet) forwards;
+  --animate-scrim-in: scrim-in var(--dur-sheet) var(--ease-out);
+  --animate-scrim-out: scrim-out 200ms var(--ease-out) forwards;
 }
 
 @layer base {
@@ -83,6 +87,14 @@
   }
 }
 
+/* Controls are 44 px high on a phone. tokens.css is copied unchanged from design/, and it is not in a
+   layer, so the override sits outside @layer base too. */
+@media (max-width: 639px) {
+  :root {
+    --control-h: 44px;
+  }
+}
+
 /* Popovers fade in and scale from 0.97. Closing takes 100 ms. */
 @keyframes pop-in {
   from {
@@ -98,7 +110,32 @@
   }
 }
 
-/* Reduced motion keeps the fades and drops the scale. */
+/* The bottom sheet slides up from the bottom edge while its scrim fades in. Closing takes 200 ms. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes scrim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion keeps the fades and drops the scale and the slide. */
 @media (prefers-reduced-motion: reduce) {
   @keyframes pop-in {
     from {
@@ -109,6 +146,20 @@
   @keyframes pop-out {
     to {
       opacity: 0;
+    }
+  }
+
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: none;
+    }
+  }
+
+  @keyframes sheet-out {
+    to {
+      opacity: 0;
+      transform: none;
     }
   }
 }

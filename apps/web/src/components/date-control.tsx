@@ -1,10 +1,10 @@
 import type { IsoDate } from "@primo/contract/schemas";
 import { Match } from "effect";
-import { useMemo, type KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 import { Icon } from "~/components/icon";
-import { Field, Picker } from "~/components/picker";
+import { DatePicker } from "~/components/date-picker";
+import { Field } from "~/components/picker";
 import { Button } from "~/components/ui/button";
-import { dateEntries, formatDateWithWeekday } from "~/date-entries";
 import { stepDate } from "~/view-params";
 
 // Previous, the date picker, next and Latest (DESIGN.UI.md, Date control). `dates` is the API's
@@ -16,14 +16,13 @@ export function DateControl(props: {
   readonly onChange: (date: IsoDate | undefined) => void;
 }) {
   const { dates, date, onChange } = props;
-  const entries = useMemo(() => dateEntries(dates ?? []), [dates]);
 
   const ready = dates !== undefined && date !== undefined;
   const older = ready ? stepDate(dates, date, -1) : undefined;
   const newer = ready ? stepDate(dates, date, 1) : undefined;
 
   const onKeyDown = (event: KeyboardEvent) => {
-    // A list in the popover is portaled but its events still bubble here, so only the control's own DOM counts.
+    // A calendar in the popover or sheet is portaled but its events still bubble here, so only the control's own DOM counts.
     if (!(event.target instanceof Node) || !event.currentTarget.contains(event.target)) {
       return;
     }
@@ -42,7 +41,12 @@ export function DateControl(props: {
 
   return (
     <Field label="Date">
-      <div role="group" aria-label="Date" onKeyDown={onKeyDown} className="flex items-center gap-1">
+      <div
+        role="group"
+        aria-label="Date"
+        onKeyDown={onKeyDown}
+        className="flex items-center gap-1 max-sm:w-full"
+      >
         <Button
           variant="icon"
           aria-label="Previous date"
@@ -51,13 +55,10 @@ export function DateControl(props: {
         >
           <Icon name="left" />
         </Button>
-        <Picker
-          label="Date"
-          entries={entries}
-          value={date}
-          valueLabel={date === undefined ? "" : formatDateWithWeekday(date)}
-          loading={!ready}
-          className="w-44"
+        <DatePicker
+          dates={dates}
+          date={date}
+          className="max-sm:min-w-0 max-sm:flex-1 sm:w-44"
           onChange={onChange}
         />
         <Button
