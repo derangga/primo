@@ -258,3 +258,10 @@
 .price-chart svg {
   outline: none;
 }
+
+/* A touch that starts on the chart is the browser's to pan by default. When it takes a horizontal drag
+   it cancels the pointer, the chart clears its tooltip, and only a tap shows one. pan-y leaves the
+   horizontal drag to the chart and a vertical swipe to the page scroll. */
+.price-chart {
+  touch-action: pan-y;
+}
