@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { Dialog } from "radix-ui";
 import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { Icon } from "~/components/icon";
@@ -64,7 +65,7 @@ export function SheetContent(props: {
           <div className="flex items-center justify-between pt-1 pr-2 pb-2 pl-4">
             <Dialog.Title className="text-lg font-semibold">{props.title}</Dialog.Title>
             <Dialog.Close
-              aria-label="Close"
+              aria-label={m.sheet_close()}
               className="flex size-11 items-center justify-center rounded-pill"
             >
               <Icon name="x" />

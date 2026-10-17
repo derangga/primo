@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { IsoDate, type AreaId, type CommodityId } from "@primo/contract/schemas";
 import { windowStart, type RangeDays } from "@primo/contract/window";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +9,7 @@ import { ErrorMessage } from "~/components/error-message";
 import { Delta, Price } from "~/components/price";
 import { PriceChart } from "~/components/price-chart";
 import { ChartTip } from "~/components/chart-tip";
-import { rangeLabels } from "~/range";
+import { rangeLabel } from "~/range";
 import { StatTile } from "~/components/stat-tile";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -43,9 +44,9 @@ function ChartSkeleton() {
           </Card>
         ))}
       </div>
-      <Card aria-label="Price over time loading">
+      <Card aria-label={m.chart_loading()}>
         <CardHeader>
-          <CardTitle>Price over time</CardTitle>
+          <CardTitle>{m.chart_title()}</CardTitle>
         </CardHeader>
         <Skeleton className="h-[220px] w-full sm:h-[280px]" />
       </Card>
@@ -91,8 +92,8 @@ export function ChartView(props: {
     return (
       <MessageCard>
         <div className="flex flex-col items-center gap-2 text-center text-text-2">
-          <div className="font-medium text-text">No prices for this selection</div>
-          <p>Try another commodity, province or range.</p>
+          <div className="font-medium text-text">{m.chart_empty_title()}</div>
+          <p>{m.chart_empty_hint()}</p>
         </div>
       </MessageCard>
     );
@@ -114,12 +115,12 @@ export function ChartView(props: {
     >
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         <StatTile
-          label="Current price"
+          label={m.tile_current()}
           figure={<Price rupiah={summary.current.price} size="tile" unit />}
           support={formatDate(summary.current.date)}
         />
         <StatTile
-          label={`Change, ${rangeLabels[data.days]}`}
+          label={m.tile_change({ range: rangeLabel(data.days) })}
           figure={
             <span className={cn("text-(length:--num-md) sm:text-(length:--num-lg)", figure)}>
               {several ? change.percent : "—"}
@@ -129,29 +130,34 @@ export function ChartView(props: {
             several ? (
               <Delta value={summary.current.price} reference={summary.first.price} show="rupiah" />
             ) : (
-              "Only one day of prices"
+              m.tile_one_day()
             )
           }
         />
         <StatTile
-          label="Lowest"
+          label={m.tile_lowest()}
           figure={<Price rupiah={summary.lowest.price} size="tile" unit />}
           support={formatDate(summary.lowest.date)}
         />
         <StatTile
-          label="Highest"
+          label={m.tile_highest()}
           figure={<Price rupiah={summary.highest.price} size="tile" unit />}
           support={formatDate(summary.highest.date)}
         />
       </div>
-      <Card aria-label="Price over time">
+      <Card aria-label={m.chart_title()}>
         <CardHeader>
-          <CardTitle>Price over time</CardTitle>
+          <CardTitle>{m.chart_title()}</CardTitle>
           <span className="text-sm text-text-2">{label} · Rp/kg</span>
         </CardHeader>
         <PriceChart
           rows={rows}
-          ariaLabel={`Area chart of the ${where} ${name} price from ${formatDate(summary.first.date)} to ${formatDate(summary.current.date)}`}
+          ariaLabel={m.chart_aria({
+            area: where,
+            commodity: name,
+            first: formatDate(summary.first.date),
+            last: formatDate(summary.current.date),
+          })}
           tip={(row) =>
             row.price === null ? null : (
               <ChartTip date={isoOf(row.date)} label={label} price={row.price} />

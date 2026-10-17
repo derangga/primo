@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import type { AreaId, CommodityId, IsoDate } from "@primo/contract/schemas";
 import { useMemo } from "react";
 import { bucket, priceFill } from "~/buckets";
@@ -54,12 +55,12 @@ export function MapView(props: {
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
       <MapCard
-        title={`${commodityName(commodity)}, price vs national average`}
-        cardLabel="Price map"
+        title={m.map_title({ commodity: commodityName(commodity) })}
+        cardLabel={m.map_card_label()}
         date={date}
         features={features}
         interaction={interaction}
-        ariaLabel={`Map of Indonesia's 34 provinces coloured by ${commodityName(commodity)} price against the national price`}
+        ariaLabel={m.map_aria({ commodity: commodityName(commodity) })}
         dimmed={stale}
         failed={failed}
         retrying={retrying}

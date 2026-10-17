@@ -11,12 +11,13 @@
     "format": "oxfmt --check",
     "lint": "oxlint",
     "types": "bun run --filter '*' types && tsc -p . && effect-language-service diagnostics --project tsconfig.json",
-    "test": "vitest run",
+    "test": "bun run messages && vitest run",
     "doctor": "react-doctor apps/web --blocking error --no-telemetry --no-supply-chain",
     "deploy": "alchemy deploy --stage prod",
     "destroy": "alchemy destroy --stage prod",
     "logs": "alchemy logs --stage prod",
-    "backfill": "bun apps/backend/scripts/backfill.ts"
+    "backfill": "bun apps/backend/scripts/backfill.ts",
+    "messages": "bun run --filter @primo/web messages"
   },
   "devDependencies": {
     "@effect/language-service": "0.87.4",

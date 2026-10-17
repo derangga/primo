@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { Icon } from "~/components/icon";
 import { Button } from "~/components/ui/button";
 
@@ -9,11 +10,11 @@ export function ErrorMessage(props: { readonly retrying: boolean; readonly onRet
     <div role="alert" className="flex flex-col items-center gap-2 text-center text-text-2">
       <div className="flex items-center gap-1.5 font-medium text-text">
         <Icon name="alert" className="text-error" />
-        Couldn&apos;t load prices
+        {m.error_title()}
       </div>
-      <p>Check your connection, then try again.</p>
+      <p>{m.error_hint()}</p>
       <Button disabled={props.retrying} onClick={props.onRetry}>
-        {props.retrying ? "Retrying" : "Retry"}
+        {props.retrying ? m.error_retrying() : m.error_retry()}
       </Button>
     </div>
   );

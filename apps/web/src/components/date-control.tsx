@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import type { IsoDate } from "@primo/contract/schemas";
 import { Match } from "effect";
 import type { KeyboardEvent } from "react";
@@ -40,16 +41,16 @@ export function DateControl(props: {
   };
 
   return (
-    <Field label="Date">
+    <Field label={m.field_date()}>
       <div
         role="group"
-        aria-label="Date"
+        aria-label={m.field_date()}
         onKeyDown={onKeyDown}
         className="flex items-center gap-1 max-sm:w-full"
       >
         <Button
           variant="icon"
-          aria-label="Previous date"
+          aria-label={m.date_previous()}
           disabled={older === undefined}
           onClick={() => older !== undefined && onChange(older)}
         >
@@ -63,14 +64,14 @@ export function DateControl(props: {
         />
         <Button
           variant="icon"
-          aria-label="Next date"
+          aria-label={m.date_next()}
           disabled={newer === undefined}
           onClick={() => newer !== undefined && onChange(newer)}
         >
           <Icon name="right" />
         </Button>
         <Button disabled={newer === undefined} onClick={() => onChange(undefined)}>
-          Latest
+          {m.date_latest()}
         </Button>
       </div>
     </Field>

@@ -1,6 +1,8 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Header } from "~/components/header";
+import { m } from "~/paraglide/messages.js";
+import { getLocale } from "~/paraglide/runtime.js";
 import styles from "~/styles.css?url";
 import { themeScript } from "~/theme-script";
 
@@ -9,7 +11,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Food Price Monitor" },
+      { title: m.app_title() },
     ],
     links: [
       { rel: "stylesheet", href: styles },
@@ -25,7 +27,7 @@ export const Route = createRootRoute({
 function RootDocument(props: { readonly children: ReactNode }) {
   return (
     // The head script sets data-theme and data-setting before React hydrates.
-    <html lang="en" suppressHydrationWarning>
+    <html lang={getLocale()} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

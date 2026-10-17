@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "types": "tsc -p . && effect-language-service diagnostics --project tsconfig.json"
+    "messages": "bun scripts/compile-messages.ts",
+    "types": "bun run messages && tsc -p . && effect-language-service diagnostics --project tsconfig.json"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "5.3.0",
@@ -29,6 +30,8 @@
     "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "2.29.0",
+    "@inlang/plugin-message-format": "4.5.4",
     "@tailwindcss/vite": "4.3.3",
     "@types/d3-geo": "3.1.1",
     "@types/d3-scale": "4.0.9",

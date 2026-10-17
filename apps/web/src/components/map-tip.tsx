@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { bucket, priceBucketLabel } from "~/buckets";
 import { BucketSwatch } from "~/components/bucket-swatch";
 import { changeBetween, formatRupiah } from "~/format";
@@ -22,14 +23,17 @@ export function MapTip(props: {
         {provinceName(props.areaId)}
       </div>
       {props.price === undefined ? (
-        <div className="text-text-2">No data on {formatDate(props.date)}</div>
+        <div className="text-text-2">{m.tip_no_data({ date: formatDate(props.date) })}</div>
       ) : (
         <>
-          <TipRow label="Price" value={`Rp ${formatRupiah(props.price)}/kg`} />
+          <TipRow label={m.tip_price()} value={`Rp ${formatRupiah(props.price)}/kg`} />
           {props.national === null ? null : (
             <>
-              <TipRow label="vs national" value={changeBetween(props.price, props.national).text} />
-              <TipRow label="Bucket" value={priceBucketLabel[kind]} />
+              <TipRow
+                label={m.vs_national()}
+                value={changeBetween(props.price, props.national).text}
+              />
+              <TipRow label={m.tip_bucket()} value={priceBucketLabel(kind)} />
             </>
           )}
         </>

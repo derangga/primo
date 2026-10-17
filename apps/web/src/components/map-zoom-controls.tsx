@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { Icon } from "~/components/icon";
 import { Button } from "~/components/ui/button";
 
@@ -25,17 +26,22 @@ export function MapZoomControls(props: {
           <Button
             variant="icon"
             className={seam}
-            aria-label="Reset the map"
+            aria-label={m.map_reset()}
             onClick={props.onReset}
           >
             <Icon name="fit" />
           </Button>
-          <Button variant="icon" className={seam} aria-label="Zoom out" onClick={props.onZoomOut}>
+          <Button
+            variant="icon"
+            className={seam}
+            aria-label={m.map_zoom_out()}
+            onClick={props.onZoomOut}
+          >
             <Icon name="minus" />
           </Button>
         </>
       ) : null}
-      <Button variant="icon" className={seam} aria-label="Zoom in" onClick={props.onZoomIn}>
+      <Button variant="icon" className={seam} aria-label={m.map_zoom_in()} onClick={props.onZoomIn}>
         <Icon name="plus" />
       </Button>
     </div>

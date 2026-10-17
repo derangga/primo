@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import type { IsoDate } from "@primo/contract/schemas";
 import { useMemo, useState } from "react";
 import { PickerOverlay } from "~/components/picker-overlay";
@@ -55,7 +56,7 @@ export function DatePicker(props: {
 
   const trigger = (
     <PickerTrigger
-      label="Date"
+      label={m.field_date()}
       valueLabel={date === undefined ? "" : formatDateWithWeekday(date)}
       loading={dates === undefined || date === undefined}
       className={className}
@@ -79,7 +80,7 @@ export function DatePicker(props: {
 
   return (
     <PickerOverlay
-      title="Date"
+      title={m.field_date()}
       open={open}
       onOpenChange={setOpen}
       trigger={trigger}

@@ -1,12 +1,16 @@
+import { m } from "~/paraglide/messages.js";
+
 export type ThemeSetting = "system" | "light" | "dark";
 
 export const themeSettings: ReadonlyArray<ThemeSetting> = ["system", "light", "dark"];
 
-export const themeLabels: Record<ThemeSetting, string> = {
-  system: "System",
-  light: "Light",
-  dark: "Dark",
+const themeMessages: Record<ThemeSetting, () => string> = {
+  system: m.theme_system,
+  light: m.theme_light,
+  dark: m.theme_dark,
 };
+
+export const themeLabel = (setting: ThemeSetting) => themeMessages[setting]();
 
 const storageKey = "theme";
 

@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import type { AreaId, CommodityId, IsoDate, Snapshot } from "@primo/contract/schemas";
 import type { ReactNode } from "react";
 import { provinceName } from "~/areas";
@@ -41,22 +42,25 @@ export function SummaryPanel(props: {
   if (price === undefined) {
     return (
       <Card
-        aria-label="Selected province"
+        aria-label={m.summary_selected()}
         className="order-first flex flex-col gap-3 lg:order-none"
       >
         <div className={overline}>
           {provinceName(area)} · {label}
         </div>
         <div className="flex flex-col gap-2 py-4 text-text-2">
-          <div className="font-medium text-text">No data for this province on this date</div>
-          <p>Choose another date, or another commodity.</p>
+          <div className="font-medium text-text">{m.summary_no_data_title()}</div>
+          <p>{m.summary_no_data_hint()}</p>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card aria-label="Selected province" className="order-first flex flex-col gap-3 lg:order-none">
+    <Card
+      aria-label={m.summary_selected()}
+      className="order-first flex flex-col gap-3 lg:order-none"
+    >
       <div className="flex min-w-0 flex-col gap-2">
         <div className={overline}>
           {provinceName(area)} · {label}
@@ -65,7 +69,7 @@ export function SummaryPanel(props: {
         {snapshot.national === null ? null : (
           <span>
             <Delta value={price} reference={snapshot.national} />{" "}
-            <span className="text-[13px] text-text-2">vs national</span>
+            <span className="text-[13px] text-text-2">{m.vs_national()}</span>
           </span>
         )}
       </div>
@@ -73,16 +77,16 @@ export function SummaryPanel(props: {
       <div className="flex flex-col gap-2">
         {snapshot.national === null ? null : (
           <>
-            <Row label="Bucket">
+            <Row label={m.tip_bucket()}>
               <span className="inline-flex items-center gap-2">
                 <BucketSwatch bucket={bucket(price, snapshot.national)} />
-                {priceBucketLabel[bucket(price, snapshot.national)]}
+                {priceBucketLabel(bucket(price, snapshot.national))}
               </span>
             </Row>
-            <Row label="National average">Rp {formatRupiah(snapshot.national)}/kg</Row>
+            <Row label={m.summary_national_average()}>Rp {formatRupiah(snapshot.national)}/kg</Row>
           </>
         )}
-        <Row label="Date">{formatDate(date)}</Row>
+        <Row label={m.field_date()}>{formatDate(date)}</Row>
       </div>
     </Card>
   );
@@ -106,11 +110,11 @@ function Overview(props: {
   const ends = extremes(snapshot.byArea);
 
   return (
-    <Card aria-label="Summary" className="order-first flex flex-col gap-3 lg:order-none">
+    <Card aria-label={m.summary_label()} className="order-first flex flex-col gap-3 lg:order-none">
       <div className="flex min-w-0 flex-col gap-2">
-        <div className={overline}>National average · {label}</div>
+        <div className={overline}>{m.summary_overview({ commodity: label })}</div>
         {snapshot.national === null ? (
-          <div className="text-text-2">No national price on this date</div>
+          <div className="text-text-2">{m.summary_no_national()}</div>
         ) : (
           <Price rupiah={snapshot.national} size="xl" unit />
         )}
@@ -119,8 +123,8 @@ function Overview(props: {
       {ends === undefined ? null : (
         <>
           {divider}
-          <Extreme title="Cheapest" end={ends.cheapest} national={snapshot.national} />
-          <Extreme title="Most expensive" end={ends.priciest} national={snapshot.national} />
+          <Extreme title={m.summary_cheapest()} end={ends.cheapest} national={snapshot.national} />
+          <Extreme title={m.summary_priciest()} end={ends.priciest} national={snapshot.national} />
         </>
       )}
     </Card>
@@ -146,7 +150,7 @@ function Extreme(props: {
       </div>
       {national === null ? null : (
         <div className="flex items-center justify-between gap-3 text-sm text-text-2">
-          <span>vs national</span>
+          <span>{m.vs_national()}</span>
           <span>{changeBetween(end.price, national).text}</span>
         </div>
       )}
@@ -156,7 +160,10 @@ function Extreme(props: {
 
 function SummarySkeleton() {
   return (
-    <Card aria-label="Summary loading" className="order-first flex flex-col gap-3 lg:order-none">
+    <Card
+      aria-label={m.summary_loading()}
+      className="order-first flex flex-col gap-3 lg:order-none"
+    >
       <Skeleton className="h-2.5 w-[150px]" />
       <Skeleton className="h-[38px] w-[220px]" />
       <Skeleton className="h-2.5 w-20" />

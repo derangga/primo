@@ -1,6 +1,6 @@
 # Primo
 
-A personal monitor for Indonesian staple food prices by province. It shows a map and a price chart for one commodity, one date and one range at a time. The live site is at https://primo.rangga.site.
+A personal monitor for Indonesian staple food prices by province. It shows a map and a price chart for one commodity, one date and one range at a time. The live site is at https://primo.rangga.site, in English, and at https://primo.rangga.site/id in Indonesian.
 
 The prices come from PIHPS, the national strategic food price information centre run by Bank Indonesia (bi.go.id). A daily job fetches them and stores them, and the browser only ever reads from this project's own API.
 
@@ -37,6 +37,8 @@ bun run check
 ```
 
 `bun run check` is the gate. It checks formatting, lints, type-checks, runs the tests and audits the React app. CI runs the same command on every pull request and every push to `master`.
+
+The interface text is in `apps/web/messages/en.json` and `id.json`. Add a message to both, then use it as `m.the_key()` from `~/paraglide/messages.js`. `bun run messages` compiles them into `apps/web/src/paraglide`, which is not committed. The decision is in `docs/adr/0008`.
 
 To run the website locally against the live API:
 

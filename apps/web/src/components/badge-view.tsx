@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { Icon } from "~/components/icon";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -8,7 +9,7 @@ export function BadgeView(props: { readonly state: BadgeState }) {
   switch (props.state.kind) {
     case "loading":
       return (
-        <Badge role="status" aria-label="Loading the newest data date" className="ml-auto">
+        <Badge role="status" aria-label={m.badge_loading()} className="ml-auto">
           <Skeleton className="h-2.5 w-24" />
         </Badge>
       );
@@ -18,7 +19,7 @@ export function BadgeView(props: { readonly state: BadgeState }) {
         <Badge role="status" className="ml-auto">
           <span className="size-1.5 rounded-full bg-accent" />
           <span>
-            Data <b className="font-medium text-text">{formatDate(props.state.date)}</b>
+            {m.badge_data()} <b className="font-medium text-text">{formatDate(props.state.date)}</b>
           </span>
         </Badge>
       );
@@ -28,8 +29,8 @@ export function BadgeView(props: { readonly state: BadgeState }) {
         <Badge role="status" variant="warn" className="ml-auto">
           <Icon name="clock" />
           <span>
-            Data <b className="font-medium">{formatDate(props.state.date)}</b>
-            <span className="max-sm:hidden"> · {props.state.ageDays} days old</span>
+            {m.badge_data()} <b className="font-medium">{formatDate(props.state.date)}</b>
+            <span className="max-sm:hidden"> · {m.badge_age({ days: props.state.ageDays })}</span>
           </span>
         </Badge>
       );
@@ -38,7 +39,7 @@ export function BadgeView(props: { readonly state: BadgeState }) {
       return (
         <Badge role="status" variant="error" className="ml-auto">
           <Icon name="alert" />
-          <span>Data unavailable</span>
+          <span>{m.badge_unavailable()}</span>
         </Badge>
       );
   }

@@ -15,6 +15,8 @@ export default defineConfig({
     ".windsurf/**",
     ".beads/**",
     "tools/oxlint/anti-slop/**",
+    // Paraglide compiles the messages into this folder on every build.
+    "apps/web/src/paraglide/**",
   ],
   jsPlugins: [
     { name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" },
