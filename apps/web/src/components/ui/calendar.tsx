@@ -1,13 +1,15 @@
 import type { ComponentProps } from "react";
 import { DayPicker } from "react-day-picker";
+import { enUS, id } from "react-day-picker/locale";
 import { Icon } from "~/components/icon";
 import { cn } from "~/lib/utils";
+import { getLocale } from "~/paraglide/runtime.js";
 
 const navButton =
   "flex size-(--cell) items-center justify-center rounded-md fine-hover:hover:bg-hover aria-disabled:pointer-events-none aria-disabled:text-text-disabled";
 
 // The shadcn Calendar over react-day-picker: a month name
-// between two month buttons, a Su to Sa row, and day cells 44 px high (40 px from 640 px) that
+// between two month buttons, a row of weekday names, and day cells 44 px high (40 px from 640 px) that
 // share the width, so the sheet is filled on a phone and the popover is seven cells wide. A day's
 // look comes from data attributes on its cell, so hover never covers a selected or disabled day.
 export function Calendar(props: ComponentProps<typeof DayPicker>) {
@@ -15,6 +17,7 @@ export function Calendar(props: ComponentProps<typeof DayPicker>) {
 
   return (
     <DayPicker
+      locale={getLocale() === "id" ? id : enUS}
       weekStartsOn={0}
       showOutsideDays
       className={cn("w-full p-2 [--cell:44px] max-sm:px-4 max-sm:pb-4 sm:[--cell:40px]", className)}

@@ -53,7 +53,7 @@ IBM Plex Sans at weights 400, 500 and 600 for everything. The scale is in `token
 - **Sizes.** `--num-xl` for the one headline figure in the summary panel, `--num-lg` in stat tiles, `--num-md` for secondary figures.
 - **Change.** `+Rp 550 (+3,4%)`: 13 px, weight 500, arrow, sign, rupiah first, percent in brackets. Use a real minus sign (−) for falls.
 - **Formats.** Dot for thousands. Comma before the single decimal of a percent. Whole rupiah. Dates as `7 Oct 2026`, or `Wed, 7 Oct 2026` inside the date trigger.
-- **Language.** Interface text is English. Province and commodity names stay in Indonesian as PIHPS gives them.
+- **Language.** Interface text is English at `/` and Indonesian at `/id` (ADR 0008). Province and commodity names stay in Indonesian in both, as PIHPS gives them. Numbers use `id-ID` in both. Dates read day, month, year with the page's language, so `7 Oct 2026` becomes `7 Okt 2026`, and the date trigger's `Wed, 7 Oct 2026` becomes `Rab, 7 Okt 2026`. The Indonesian messages are 13% longer in total, and 21 of the 74 are more than 30% longer, so no control may rely on an English string's width.
 
 ## Layout
 
@@ -79,7 +79,7 @@ Each component's exact values are in its code under `apps/web/src/components/`. 
 
 ### Header
 
-App title, date badge, theme switcher. Card surface with a bottom border. It scrolls with the page. There is one page, so the header has no navigation.
+App title, date badge, language switcher, theme switcher. Card surface with a bottom border. It scrolls with the page. There is one page, so the header has no navigation.
 
 ### Section heading
 
@@ -104,6 +104,10 @@ Not interactive. Four states:
 | Fresh | Accent dot, "Data", the newest date |
 | Stale, newest date more than 4 days old | Warning colours, clock icon, date, then "· 7 days old". Below 640 px the age is dropped |
 | Error | Error colours, alert icon, "Data unavailable" |
+
+### Language switcher
+
+A 36 px round link before the theme switcher, with the same border and hover as that button. It shows the two-letter code of the language it leads to (`ID` on the English page, `EN` on the Indonesian one). Its accessible name is "Language: Bahasa Indonesia" in the current language, and the link carries `lang` and `hreflang` of its target. It is a plain link, so it loads the other language's prerendered page and keeps the search params.
 
 ### Theme switcher
 

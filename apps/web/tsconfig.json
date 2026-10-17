@@ -4,7 +4,8 @@
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "types": ["vite/client"],
-    "paths": { "~/*": ["./src/*"] }
+    "paths": { "~/*": ["./src/*"] },
+    "resolveJsonModule": true
   },
-  "include": ["src", "test", "vite.config.ts"]
+  "include": ["src", "test", "scripts", "vite.config.ts", "paraglide.config.ts"]
 }

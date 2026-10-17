@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { useSyncExternalStore } from "react";
 import { Icon, type IconName } from "~/components/icon";
 import { Button } from "~/components/ui/button";
@@ -13,7 +14,7 @@ import {
   readThemeSetting,
   setThemeSetting,
   subscribeThemeSetting,
-  themeLabels,
+  themeLabel,
   themeSettings,
   type ThemeSetting,
 } from "~/theme";
@@ -40,7 +41,7 @@ export function ThemeSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="round" aria-label={`Theme: ${themeLabels[setting]}`}>
+        <Button variant="round" aria-label={m.theme_label({ setting: themeLabel(setting) })}>
           {themeSettings.map((option) => (
             <Icon key={option} name={icons[option]} className={iconVisibility[option]} />
           ))}
@@ -53,7 +54,7 @@ export function ThemeSwitcher() {
         >
           {themeSettings.map((option) => (
             <DropdownMenuRadioItem key={option} value={option}>
-              {themeLabels[option]}
+              {themeLabel(option)}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

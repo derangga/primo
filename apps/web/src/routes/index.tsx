@@ -9,6 +9,7 @@ import { FilterBar } from "~/components/filter-bar";
 import { MapView } from "~/components/map-view";
 import { Field, Picker } from "~/components/picker";
 import { RangeControl } from "~/components/range-control";
+import { m } from "~/paraglide/messages.js";
 import { datesOptions } from "~/queries";
 import { AreaId } from "@primo/contract/schemas";
 import { resolveDate, validateViewSearch } from "~/view-params";
@@ -16,14 +17,7 @@ import { resolveDate, validateViewSearch } from "~/view-params";
 export const Route = createFileRoute("/")({
   validateSearch: validateViewSearch,
   head: () => ({
-    meta: [
-      { title: "Food Price Monitor" },
-      {
-        name: "description",
-        content:
-          "Staple food prices by Indonesian province, coloured against the national price, and how each has moved over the last 90 days.",
-      },
-    ],
+    meta: [{ title: m.app_title() }, { name: "description", content: m.home_description() }],
   }),
   component: HomeRoute,
 });
@@ -64,28 +58,25 @@ function HomeRoute() {
 
   return (
     <>
-      <h1 className="sr-only">Food prices</h1>
+      <h1 className="sr-only">{m.home_heading()}</h1>
       <FilterBar
         commodity={commodity}
         onCommodity={(next) =>
           navigate({ search: (prev) => ({ ...prev, commodity: next }), resetScroll: false })
         }
       >
-        <Field label="Province">
+        <Field label={m.field_province()}>
           <Picker
-            label="Province"
-            entries={provinceEntries}
+            label={m.field_province()}
+            entries={provinceEntries()}
             value={search.area === undefined ? "all" : String(search.area)}
-            valueLabel={search.area === undefined ? "All provinces" : provinceName(search.area)}
+            valueLabel={search.area === undefined ? m.all_provinces() : provinceName(search.area)}
             className="sm:w-60"
             onChange={(next) => setArea(next === "all" ? undefined : AreaId.make(Number(next)))}
           />
         </Field>
       </FilterBar>
-      <SectionHead
-        title="Prices by province"
-        note="One day's price in every province, coloured against the national price."
-      >
+      <SectionHead title={m.section_map_title()} note={m.section_map_note()}>
         <DateControl
           dates={dates}
           date={dates === undefined ? undefined : resolveDate(dates, search.date)}
@@ -100,10 +91,7 @@ function HomeRoute() {
         area={search.area}
         onArea={setArea}
       />
-      <SectionHead
-        title="Price trend"
-        note="How the price has moved over the range, nationally or in the province you picked."
-      >
+      <SectionHead title={m.section_trend_title()} note={m.section_trend_note()}>
         <RangeControl
           value={search.range ?? 30}
           onChange={(next) =>

@@ -1,5 +1,6 @@
+import { m } from "~/paraglide/messages.js";
 import { rangeDays, type RangeDays } from "@primo/contract/window";
-import { rangeLabels } from "~/range";
+import { rangeLabel } from "~/range";
 import { Field } from "~/components/picker";
 import { cn } from "~/lib/utils";
 
@@ -10,10 +11,10 @@ export function RangeControl(props: {
   readonly onChange: (range: RangeDays) => void;
 }) {
   return (
-    <Field label="Range">
+    <Field label={m.field_range()}>
       <div
         role="group"
-        aria-label="Range"
+        aria-label={m.field_range()}
         className="inline-flex w-full gap-0.5 rounded-md border border-border bg-card p-[3px] sm:w-auto"
       >
         {rangeDays.map((days) => (
@@ -26,7 +27,7 @@ export function RangeControl(props: {
               "h-8 flex-1 rounded-[6px] px-3 font-medium whitespace-nowrap text-text-2 fine-hover:hover:bg-hover fine-hover:hover:text-text aria-pressed:bg-accent-soft aria-pressed:text-accent sm:flex-none",
             )}
           >
-            {rangeLabels[days]}
+            {rangeLabel(days)}
           </button>
         ))}
       </div>

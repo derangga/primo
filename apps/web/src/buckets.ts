@@ -1,3 +1,5 @@
+import { m } from "~/paraglide/messages.js";
+
 export type Bucket = "far-below" | "below" | "near" | "above" | "far-above" | "no-data";
 
 // Where a price falls against the national price, in the bands of DESIGN.md "Map buckets".
@@ -39,12 +41,14 @@ export const priceFill: Record<Bucket, string> = {
   "no-data": "url(#hatch)",
 };
 
-// The words for each bucket, against the national price.
-export const priceBucketLabel: Record<Bucket, string> = {
-  "far-below": "Far below average",
-  below: "Below average",
-  near: "Near average",
-  above: "Above average",
-  "far-above": "Far above average",
-  "no-data": "No data",
+// The words for each bucket, against the national price, in the active locale.
+const bucketMessages: Record<Bucket, () => string> = {
+  "far-below": m.bucket_far_below,
+  below: m.bucket_below,
+  near: m.bucket_near,
+  above: m.bucket_above,
+  "far-above": m.bucket_far_above,
+  "no-data": m.no_data,
 };
+
+export const priceBucketLabel = (kind: Bucket) => bucketMessages[kind]();

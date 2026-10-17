@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import type { CommodityId } from "@primo/contract/schemas";
 import type { ReactNode } from "react";
 import { Field, Picker } from "~/components/picker";
@@ -11,9 +12,9 @@ export function FilterBar(props: {
 }) {
   return (
     <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
-      <Field label="Commodity">
+      <Field label={m.field_commodity()}>
         <Picker
-          label="Commodity"
+          label={m.field_commodity()}
           entries={commodityEntries}
           value={props.commodity}
           valueLabel={commodityName(props.commodity)}

@@ -1,3 +1,4 @@
+import { m } from "~/paraglide/messages.js";
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { Icon } from "~/components/icon";
 import { OptionList } from "~/components/option-list";
@@ -34,7 +35,7 @@ export function PickerTrigger(
     <button
       type="button"
       disabled={loading}
-      aria-label={loading ? label : `${label}: ${valueLabel}`}
+      aria-label={loading ? label : m.picker_value({ label, value: valueLabel })}
       className={cn(
         "flex h-(--control-h) w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left whitespace-nowrap fine-hover:hover:border-border-strong aria-expanded:border-accent disabled:bg-page disabled:text-text-disabled",
         className,
