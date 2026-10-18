@@ -186,6 +186,10 @@ HTML below the map, not part of the chart. A joined strip of the five buckets, b
 
 The attribution "© OpenStreetMap contributors" is a caption line under the legend row inside the map card, 11 px in `--color-text-2`, underlined, linking to https://www.openstreetmap.org/copyright. The shapes file is ODbL data and the licence asks for it wherever the map shows, so the map card carries it in every state. Decided 2026-10-09.
 
+### Page footer
+
+Below the chart, outside the content cards: one paragraph of three sentences at `--text-xs` in `--color-text-2`, with no heading and no link. It says that the prices come from PIHPS (Pusat Informasi Harga Pangan Strategis), run by Bank Indonesia, that each province is coloured against the national price for the same day, and that the data updates once a day at 08:00 WIB. It is separate from the map's attribution, which the licence keeps inside the map card. It is also the one block of text on the page that does not wait for data, so a search engine has something to read. Decided 2026-10-18.
+
 ### Tooltips
 
 Card surface with `--shadow-pop`. A title line, then label and value rows with right-aligned values.

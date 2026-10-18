@@ -1,7 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_title": "Food Price Monitor",
-  "home_description": "Staple food prices by Indonesian province, coloured against the national price, and how each has moved over the last 90 days.",
+  "home_description": "Daily staple food prices for all 34 Indonesian provinces, coloured against the national price, with price trends over 7 days, 1 month or 3 months.",
+  "home_title": "Food Price Monitor: Indonesia Staple Prices by Province",
   "home_heading": "Food prices",
   "field_commodity": "Commodity",
   "field_province": "Province",
@@ -73,5 +74,6 @@
   "tile_change": "Change, {range}",
   "tile_one_day": "Only one day of prices",
   "tile_lowest": "Lowest",
-  "tile_highest": "Highest"
+  "tile_highest": "Highest",
+  "footer_about": "Prices come from PIHPS (Pusat Informasi Harga Pangan Strategis), run by Bank Indonesia. Each province is coloured against the national price for the same day. The data updates once a day at 08:00 WIB."
 }

@@ -16,9 +16,6 @@ import { resolveDate, validateViewSearch } from "~/view-params";
 
 export const Route = createFileRoute("/")({
   validateSearch: validateViewSearch,
-  head: () => ({
-    meta: [{ title: m.app_title() }, { name: "description", content: m.home_description() }],
-  }),
   component: HomeRoute,
 });
 
