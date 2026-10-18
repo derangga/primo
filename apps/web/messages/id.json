@@ -1,7 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_title": "Pemantau Harga Pangan",
-  "home_description": "Harga pangan pokok menurut provinsi di Indonesia, diwarnai menurut harga nasional, dan pergerakannya selama 90 hari terakhir.",
+  "home_description": "Harga pangan pokok harian di 34 provinsi Indonesia, diwarnai menurut harga nasional, dengan tren harga 7 hari, 1 bulan, atau 3 bulan.",
+  "home_title": "Pemantau Harga Pangan: Harga Pangan Pokok per Provinsi",
   "home_heading": "Harga pangan",
   "field_commodity": "Komoditas",
   "field_province": "Provinsi",
@@ -73,5 +74,6 @@
   "tile_change": "Perubahan, {range}",
   "tile_one_day": "Hanya satu hari harga",
   "tile_lowest": "Terendah",
-  "tile_highest": "Tertinggi"
+  "tile_highest": "Tertinggi",
+  "footer_about": "Harga bersumber dari PIHPS (Pusat Informasi Harga Pangan Strategis) yang dikelola Bank Indonesia. Setiap provinsi diberi warna menurut harga nasional pada hari yang sama. Data diperbarui sekali sehari pukul 08.00 WIB."
 }

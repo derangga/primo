@@ -40,6 +40,8 @@ bun run check
 
 The interface text is in `apps/web/messages/en.json` and `id.json`. Add a message to both, then use it as `m.the_key()` from `~/paraglide/messages.js`. `bun run messages` compiles them into `apps/web/src/paraglide`, which is not committed. The decision is in `docs/adr/0008`.
 
+The page's head (canonical URL, `hreflang`, Open Graph, JSON-LD) is built in `apps/web/src/seo.ts` from `VITE_SITE_URL`, which `alchemy.run.ts` sets. `public/robots.txt` and `public/sitemap.xml` repeat the domain by hand. `public/icon-512.png` comes from `bun apps/web/scripts/render-icon.ts`. The decision is in `docs/adr/0009`.
+
 To run the website locally against the live API:
 
 ```sh
