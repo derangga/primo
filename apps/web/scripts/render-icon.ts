@@ -6,13 +6,18 @@ import { crc32, deflateSync } from "node:zlib";
 // renderer in the toolchain, so this fills the shape itself, with 4 by 4 samples per pixel.
 // Run it with `bun apps/web/scripts/render-icon.ts` after the favicon's shape or colours change.
 const size = 512;
+
 const samples = 4;
+
 const background = [0xf3, 0xf4, 0xf6];
+
 const accent = [0x35, 0x38, 0xa8];
 
 // The favicon's 24 by 24 box: a 14 unit square with 3 unit corners, turned 45 degrees about (12, 12).
 const scale = 24 / size;
+
 const half = 7;
+
 const corner = 3;
 
 // The distance from a point to the diamond's outline, negative inside.
@@ -73,7 +78,9 @@ function chunk(type: string, data: Buffer) {
 const header = Buffer.alloc(13);
 
 header.writeUInt32BE(size, 0);
+
 header.writeUInt32BE(size, 4);
+
 // 8 bits per channel, colour type 2 (RGB), no interlace.
 header.set([8, 2, 0, 0, 0], 8);
 
