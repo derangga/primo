@@ -12,7 +12,7 @@ import { RangeControl } from "~/components/range-control";
 import { m } from "~/paraglide/messages.js";
 import { datesOptions } from "~/queries";
 import { AreaId } from "@primo/contract/schemas";
-import { resolveDate, validateViewSearch } from "~/view-params";
+import { defaultRange, hasActiveFilters, resolveDate, validateViewSearch } from "~/view-params";
 
 export const Route = createFileRoute("/")({
   validateSearch: validateViewSearch,
@@ -61,6 +61,8 @@ function HomeRoute() {
         onCommodity={(next) =>
           navigate({ search: (prev) => ({ ...prev, commodity: next }), resetScroll: false })
         }
+        canReset={hasActiveFilters(search)}
+        onReset={() => navigate({ search: {}, resetScroll: false })}
       >
         <Field label={m.field_province()}>
           <Picker
@@ -90,7 +92,7 @@ function HomeRoute() {
       />
       <SectionHead title={m.section_trend_title()} note={m.section_trend_note()}>
         <RangeControl
-          value={search.range ?? 30}
+          value={search.range ?? defaultRange}
           onChange={(next) =>
             navigate({ search: (prev) => ({ ...prev, range: next }), resetScroll: false })
           }
@@ -99,7 +101,7 @@ function HomeRoute() {
       <ChartView
         commodity={commodity}
         area={search.area ?? AreaId.make(0)}
-        range={search.range ?? 30}
+        range={search.range ?? defaultRange}
       />
     </>
   );

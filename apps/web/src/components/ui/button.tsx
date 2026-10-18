@@ -4,7 +4,7 @@ import { cn } from "~/lib/utils";
 
 // The text button and the icon button. Hover only where a fine pointer exists.
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center border border-border bg-card font-medium whitespace-nowrap transition-[transform,background-color,border-color] duration-(--dur-press) active:scale-[0.97] motion-reduce:active:scale-100 disabled:pointer-events-none disabled:bg-page disabled:text-text-disabled",
+  "inline-flex shrink-0 items-center justify-center border border-border bg-card font-medium whitespace-nowrap transition-[transform,background-color,border-color] duration-(--dur-press) active:scale-[0.97] motion-reduce:active:scale-100 disabled:pointer-events-none disabled:bg-page disabled:text-text-disabled aria-disabled:pointer-events-none aria-disabled:bg-page aria-disabled:text-text-disabled",
   {
     variants: {
       variant: {

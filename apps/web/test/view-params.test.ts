@@ -1,6 +1,6 @@
-import { IsoDate } from "@primo/contract/schemas";
+import { AreaId, IsoDate } from "@primo/contract/schemas";
 import { expect, it } from "vitest";
-import { resolveDate, stepDate, validateViewSearch } from "../src/view-params";
+import { hasActiveFilters, resolveDate, stepDate, validateViewSearch } from "../src/view-params";
 
 const day = (date: string) => IsoDate.make(date);
 
@@ -67,4 +67,17 @@ it("accepts the three ranges and drops any other", () => {
   expect(validateViewSearch({ range: 90 }).range).toBe(90);
   expect(validateViewSearch({ range: 14 }).range).toBeUndefined();
   expect(validateViewSearch({ range: "30" }).range).toBeUndefined();
+});
+
+it("has no active filters on the bare URL, or when a param is spelled as its default", () => {
+  expect(hasActiveFilters({})).toBe(false);
+  expect(hasActiveFilters({ commodity: "cat_1", range: 30 })).toBe(false);
+});
+
+it("has an active filter for each param that differs from the default", () => {
+  expect(hasActiveFilters({ commodity: "cat_2" })).toBe(true);
+  expect(hasActiveFilters({ area: AreaId.make(31) })).toBe(true);
+  expect(hasActiveFilters({ date: day("2026-10-07") })).toBe(true);
+  expect(hasActiveFilters({ range: 7 })).toBe(true);
+  expect(hasActiveFilters({ range: 90 })).toBe(true);
 });

@@ -1,5 +1,6 @@
 import { AreaId, CommodityId, IsoDate } from "@primo/contract/schemas";
 import { Option, Schema } from "effect";
+import { defaultCommodity } from "~/commodities";
 
 // The URL's search params are untrusted. Each one is decoded on its own with the contract's schema,
 // and one that fails is dropped, so the view falls back to that param's default (DESIGN.md, Interface).
@@ -40,6 +41,20 @@ export function validateViewSearch(search: {
     date: Option.getOrUndefined(decodeDate(search["date"])),
     range: Option.getOrUndefined(decodeRange(search["range"])),
   };
+}
+
+export const defaultRange: Range = 30;
+
+// Whether the URL holds anything the defaults would not show: another commodity, a province, a date,
+// or another range. The reset button is enabled exactly then. A param spelled as its default
+// (`range=30`) counts as the default, so the button does not offer to change nothing.
+export function hasActiveFilters(search: ViewSearch) {
+  return (
+    (search.commodity !== undefined && search.commodity !== defaultCommodity) ||
+    search.area !== undefined ||
+    search.date !== undefined ||
+    (search.range !== undefined && search.range !== defaultRange)
+  );
 }
 
 // The date to show: the requested one when it has data, otherwise the newest.

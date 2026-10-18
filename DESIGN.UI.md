@@ -130,6 +130,15 @@ Changing any filter rewrites a search param without changing the page, so none o
 viewport (`resetScroll: false` on every `navigate`). Below 640 px the map fills the screen once
 scrolled to, and the default would have thrown it off screen on every province picked.
 
+### Reset button
+
+Ends the shared filter row, beside the province picker. It clears every search param, the date and the range as well as the commodity and the province, so the URL becomes the bare path. It pushes a history entry, so Back undoes it. Added 2026-10-18.
+
+- From 640 px it is a text button, "Reset". Below that it is a `--control-h` square icon button (a counter-clockwise arrow) in the province row, with the province picker filling the rest of the row. It adds no height, because the map is already low on a phone.
+- Its accessible name and `title` are "Reset filters" on both layouts.
+- It is always shown. While the URL holds nothing the defaults would not show, it is `aria-disabled` in the disabled colours and does nothing. It is not `disabled`, so a keyboard user who pressed it keeps focus. A param spelled as its default (`range=30`) counts as the default.
+- The map's zoom is not in the URL, so it is not reset. The map has its own reset.
+
 ### Date control
 
 Previous button, date trigger, next button, "Latest" button.

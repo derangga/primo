@@ -14,6 +14,8 @@
   "date_previous": "Previous date",
   "date_next": "Next date",
   "date_latest": "Latest",
+  "filters_reset": "Reset",
+  "filters_reset_label": "Reset filters",
   "range_7": "7 days",
   "range_30": "1 month",
   "range_90": "3 months",

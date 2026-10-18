@@ -15,6 +15,7 @@ const paths = {
   x: "M3.5 3.5l7 7M10.5 3.5l-7 7",
   plus: "M7 2.5v9M2.5 7h9",
   minus: "M2.5 7h9",
+  reset: "M2.5 2.5v3h3M2.9 5.5a4.8 4.8 0 1 1-.4 3.3",
   fit: "M2 5V2.5h3M12 5V2.5H9M2 9v2.5h3M12 9v2.5H9",
 };
 
