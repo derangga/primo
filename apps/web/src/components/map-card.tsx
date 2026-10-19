@@ -1,12 +1,21 @@
 import type { IsoDate } from "@primo/contract/schemas";
+import { lazy, Suspense } from "react";
 import { ErrorMessage } from "~/components/error-message";
 import { MapAttribution } from "~/components/map-attribution";
 import { MapLegend } from "~/components/map-legend";
-import { ProvinceMap, type MapInteraction } from "~/components/province-map";
+import type { MapInteraction } from "~/components/province-map";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { formatDate } from "~/date-badge-state";
 import type { ProvinceFeature } from "~/provinces";
+
+// The map library is its own chunk, so it stays out of the bundle that hydrates the page. The download
+// starts here, beside the outline and price requests, rather than once they arrive.
+const mapModule = import("~/components/province-map");
+
+const ProvinceMap = lazy(() => mapModule.then((module) => ({ default: module.ProvinceMap })));
+
+const mapSkeleton = <Skeleton className="aspect-[5/2] w-full" />;
 
 // The diagonal hatch of DESIGN.UI.md, Map styling, "No data". It lives in the page, outside the chart,
 // because TanStack Charts has no pattern resource; the no-data paints reference it as url(#hatch).
@@ -74,15 +83,17 @@ export function MapCard(props: {
       <div className="relative">
         <HatchPattern />
         {features === undefined ? (
-          <Skeleton className="aspect-[5/2] w-full" />
+          mapSkeleton
         ) : (
-          <div className={dimmed ? "opacity-60" : undefined}>
-            <ProvinceMap
-              features={features}
-              interaction={interaction}
-              ariaLabel={props.ariaLabel}
-            />
-          </div>
+          <Suspense fallback={mapSkeleton}>
+            <div className={dimmed ? "opacity-60" : undefined}>
+              <ProvinceMap
+                features={features}
+                interaction={interaction}
+                ariaLabel={props.ariaLabel}
+              />
+            </div>
+          </Suspense>
         )}
         {props.failed ? <MapError retrying={props.retrying} onRetry={props.onRetry} /> : null}
       </div>

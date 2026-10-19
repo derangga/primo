@@ -1,10 +1,15 @@
 import { m } from "~/paraglide/messages.js";
 import type { IsoDate } from "@primo/contract/schemas";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { PickerOverlay } from "~/components/picker-overlay";
 import { PickerTrigger } from "~/components/picker";
-import { Calendar } from "~/components/ui/calendar";
 import { formatDateWithWeekday, localDay, localDayKey } from "~/date-entries";
+
+// The calendar library is its own chunk, so it stays out of the bundle that hydrates the page. The
+// download starts here, so the chunk is usually in by the time someone opens the picker.
+const calendarModule = import("~/components/ui/calendar");
+
+const Calendar = lazy(() => calendarModule.then((module) => ({ default: module.Calendar })));
 
 // A month calendar where only the days that have data can be picked. The month buttons stop at the
 // oldest and newest month with data, and the days of the neighbouring months are drawn disabled.
@@ -86,7 +91,7 @@ export function DatePicker(props: {
       trigger={trigger}
       popoverClassName="w-auto p-0"
     >
-      {calendar}
+      <Suspense fallback={null}>{calendar}</Suspense>
     </PickerOverlay>
   );
 }

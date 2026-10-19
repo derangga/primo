@@ -4,6 +4,9 @@ import { DataFooter } from "~/components/data-footer";
 import { Header } from "~/components/header";
 import { getLocale } from "~/paraglide/runtime.js";
 import { pageHead, siteOrigin } from "~/seo";
+import plex400 from "@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url";
+import plex500 from "@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2?url";
+import plex600 from "@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2?url";
 import styles from "~/styles.css?url";
 import { themeScript } from "~/theme-script";
 
@@ -20,6 +23,15 @@ export const Route = createRootRoute({
       ],
       links: [
         { rel: "stylesheet", href: styles },
+        // The first paint waits for the fonts, and the stylesheet alone would only ask for them
+        // once it has arrived. These are the files styles.css imports.
+        ...[plex400, plex500, plex600].map((href) => ({
+          rel: "preload",
+          href,
+          as: "font",
+          type: "font/woff2",
+          crossOrigin: "anonymous" as const,
+        })),
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
         { rel: "icon", href: "/favicon.ico", sizes: "any" },
         ...page.links,

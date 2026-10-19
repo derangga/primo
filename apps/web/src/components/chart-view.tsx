@@ -2,12 +2,11 @@ import { m } from "~/paraglide/messages.js";
 import { IsoDate, type AreaId, type CommodityId } from "@primo/contract/schemas";
 import { windowStart, type RangeDays } from "@primo/contract/window";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, type ReactNode } from "react";
+import { lazy, Suspense, useMemo, type ReactNode } from "react";
 import { areaName } from "~/areas";
 import { commodityName } from "~/commodities";
 import { ErrorMessage } from "~/components/error-message";
 import { Delta, Price } from "~/components/price";
-import { PriceChart } from "~/components/price-chart";
 import { ChartTip } from "~/components/chart-tip";
 import { rangeLabel } from "~/range";
 import { StatTile } from "~/components/stat-tile";
@@ -18,6 +17,14 @@ import { cn } from "~/lib/utils";
 import { changeBetween } from "~/format";
 import { seriesOptions } from "~/queries";
 import { isoOf, summarise, weekdayRows } from "~/series";
+
+// The chart library is its own chunk, so it stays out of the bundle that hydrates the page. The
+// download starts here, beside the price request, rather than once the prices arrive.
+const chartModule = import("~/components/price-chart");
+
+const PriceChart = lazy(() => chartModule.then((module) => ({ default: module.PriceChart })));
+
+const chartSkeleton = <Skeleton className="h-[220px] w-full sm:h-[280px]" />;
 
 const figure = "leading-(--leading-num) font-semibold tracking-[-0.01em] whitespace-nowrap";
 
@@ -48,7 +55,7 @@ function ChartSkeleton() {
         <CardHeader>
           <CardTitle>{m.chart_title()}</CardTitle>
         </CardHeader>
-        <Skeleton className="h-[220px] w-full sm:h-[280px]" />
+        {chartSkeleton}
       </Card>
     </>
   );
@@ -150,20 +157,22 @@ export function ChartView(props: {
           <CardTitle>{m.chart_title()}</CardTitle>
           <span className="text-sm text-text-2">{label} · Rp/kg</span>
         </CardHeader>
-        <PriceChart
-          rows={rows}
-          ariaLabel={m.chart_aria({
-            area: where,
-            commodity: name,
-            first: formatDate(summary.first.date),
-            last: formatDate(summary.current.date),
-          })}
-          tip={(row) =>
-            row.price === null ? null : (
-              <ChartTip date={isoOf(row.date)} label={label} price={row.price} />
-            )
-          }
-        />
+        <Suspense fallback={chartSkeleton}>
+          <PriceChart
+            rows={rows}
+            ariaLabel={m.chart_aria({
+              area: where,
+              commodity: name,
+              first: formatDate(summary.first.date),
+              last: formatDate(summary.current.date),
+            })}
+            tip={(row) =>
+              row.price === null ? null : (
+                <ChartTip date={isoOf(row.date)} label={label} price={row.price} />
+              )
+            }
+          />
+        </Suspense>
       </Card>
     </div>
   );
