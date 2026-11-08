@@ -115,7 +115,10 @@ export function PriceChart(props: {
   }, [rows, narrow]);
 
   return (
-    <div className="price-chart">
+    // The chart's svg is a keyboard stop, so a click or tap would focus it and the library would then
+    // open a keyboard tooltip at the first day. Cancelling mousedown stops the focus and leaves the
+    // click, and Tab, to focus it as before.
+    <div className="price-chart" onMouseDown={(event) => event.preventDefault()}>
       <Chart
         definition={definition}
         height={narrow ? 220 : 280}
